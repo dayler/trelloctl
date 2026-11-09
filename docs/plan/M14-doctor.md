@@ -1,7 +1,7 @@
 ---
 id: M14
 title: Diagnóstico doctor y doctor --api
-status: pending
+status: in_progress
 wave: 7
 depends_on: [M08, M10, M11, M12, M13]
 branch: feature/m14-doctor
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M14 — Diagnóstico `doctor` y `doctor --api`
 
-**Estado:** ⚪ Pendiente · **Ola:** 7 · **Depende de:** M08, M10, M11, M12, M13 · **Rama:** `feature/m14-doctor`
+**Estado:** 🟡 En curso · **Ola:** 7 · **Depende de:** M08, M10, M11, M12, M13 · **Rama:** `feature/m14-doctor`
 
 ## Objetivo
 
@@ -42,9 +42,9 @@ Cualquier corrección automática del entorno.
 
 | Fase | Descripción                                                     | Estado |
 | ---- | --------------------------------------------------------------- | ------ |
-| F1   | Implementación                                                  | ⚪      |
-| F2   | Pruebas unitarias                                               | ⚪      |
-| F3   | TCs automatizados                                               | ⚪      |
+| F1   | Implementación                                                  | 🟢      |
+| F2   | Pruebas unitarias                                               | 🟢      |
+| F3   | TCs automatizados                                               | 🟢      |
 | F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | ⚪      |
 | F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪      |
 
