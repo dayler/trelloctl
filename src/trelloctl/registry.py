@@ -302,7 +302,33 @@ def _config() -> list[Operation]:
 
 
 # ==== BEGIN block: doctor ====
-# M14 adds the `doctor` operation here.
+@block("doctor")
+def _doctor() -> list[Operation]:
+    from trelloctl import doctor as cmd
+
+    return [
+        Operation(
+            ("doctor",),
+            "environment diagnostics (--api checks the Trello contract)",
+            "trelloctl doctor --api",
+            cmd.run,
+            params=(
+                Param("json", "print the report as a JSON envelope", ParamType.BOOL),
+                Param(
+                    "api", "check the Trello contract and read the default board", ParamType.BOOL
+                ),
+            ),
+            description=(
+                "Check the interpreter, working directory, configuration, credentials, DNS, "
+                "TLS, token, default board, cache, MCP extra, skill and Inbox. Prints a "
+                "text report (JSON with --json); exits 1 when any check fails."
+            ),
+            text_output=lambda args: not args.get("json"),
+            mcp=False,
+        ),
+    ]
+
+
 # ==== END block: doctor ====
 
 

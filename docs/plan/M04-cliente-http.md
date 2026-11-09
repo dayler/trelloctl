@@ -1,7 +1,7 @@
 ---
 id: M04
 title: Cliente HTTP de Trello
-status: in_review
+status: done
 wave: 2
 depends_on: [M01]
 branch: feature/m04-cliente-http
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M04 — Cliente HTTP de Trello
 
-**Estado:** 🔵 En revisión · **Ola:** 2 · **Depende de:** M01 · **Rama:** `feature/m04-cliente-http`
+**Estado:** 🟢 Completado · **Ola:** 2 · **Depende de:** M01 · **Rama:** `feature/m04-cliente-http`
 
 ## Objetivo
 
@@ -45,7 +45,7 @@ Traducción de 404 a `<ENTIDAD>_NOT_FOUND` y de 401/403 sobre tableros a `BOARD_
 | F2   | Pruebas unitarias (con stub de transporte)                      | 🟢      |
 | F3   | TCs automatizados (contra el Trello falso)                      | 🟢      |
 | F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | 🟢      |
-| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪      |
+| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | 🟢 |
 
 ## Casos de prueba automatizados
 
@@ -84,3 +84,4 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 | 2026-11-09 | F1-F3: cliente HTTP, stub de transporte, rutas `members` y `attachments` del Trello falso; 21 TCs automatizados y verificados uno a uno |
 | 2026-11-09 | Añadido `tests/acceptance/conftest.py` (recolección de basura silenciosa tras cada prueba): fugas preexistentes de `HTTPError` en pruebas de M00 provocaban un fallo intermitente de `test_rotation_failure_warns_and_writing_continues` (M01) al recoger la basura; fuera del alcance declarado, anotado como desviación |
 | 2026-11-09 | F4: ruff check, ruff format --check, mypy, pytest (cobertura global ≥ 90 %) y trazabilidad en verde en local. F5 (PR y CI) queda ⚪: solo local, PR y CI pendientes de confirmación del usuario |
+| 2026-11-09 | F5: PR #5 fusionado en `develop` con merge commit, CI en verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14. Estado: `done`. |

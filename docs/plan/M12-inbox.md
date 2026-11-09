@@ -1,7 +1,7 @@
 ---
 id: M12
 title: Inbox personal
-status: in_review
+status: done
 wave: 6
 depends_on: [M09]
 branch: feature/m12-inbox
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M12 — Inbox personal
 
-**Estado:** 🔵 En revisión · **Ola:** 6 · **Depende de:** M09 · **Rama:** `feature/m12-inbox`
+**Estado:** 🟢 Completado · **Ola:** 6 · **Depende de:** M09 · **Rama:** `feature/m12-inbox`
 
 ## Objetivo
 
@@ -45,7 +45,7 @@ Cualquier otra operación entre tableros (PRD §9).
 | F2   | Pruebas unitarias                                               | 🟢      |
 | F3   | TCs automatizados                                               | 🟢      |
 | F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | 🟢      |
-| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪ (solo local: PR y CI pendientes de confirmación del usuario) |
+| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | 🟢 |
 
 ## Casos de prueba automatizados
 
@@ -82,3 +82,4 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 | 2026-11-09 | Implementación de `inbox list|add|move`, bloque `inbox` del registro, Trello falso (`inbox.py`, `members.py`, `PUT` con `idBoard`) y 19 TCs automatizados (+ pruebas unitarias) |
 | 2026-11-09 | F4 local: ruff check, ruff format --check, mypy y check_traceability OK; suite completa 806 passed + 1 skipped (ejecutada en 8 procesos con cobertura combinada: 99 %, sin fallo del umbral de 90 %) |
 | 2026-11-09 | Nota: la fila `boards.kind = "inbox"` la pisa con `"board"` un `sync_metadata` genérico (`app/resolver.py`, fuera de alcance); `inbox` la vuelve a resolver con una llamada a `members/me` |
+| 2026-11-09 | F5: PR #14 fusionado en `develop` con merge commit, CI en verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14. Estado: `done`. |
