@@ -106,6 +106,7 @@ Subgrupos `card comment|label|member|checklist` (M10) y `card attachments` (M11)
 | TC-M09-053 | AC-16.4           | N    | E     | `card delete X`                                                                              | El comando no existe: `USAGE`                                                                       |
 | TC-M09-054 | AC-22.13          | N    | E     | `card update <id> --name Y` sobre una tarjeta borrada en Trello                              | `CARD_NOT_FOUND`; `cards.deleted` marcado                                                           |
 | TC-M09-055 | AC-22.11          | P    | E     | Escritura con el TTL de tarjetas vencido                                                     | No recarga el snapshot; actualiza la fila con `fetched_at` de la respuesta                          |
+| TC-M09-056 | AC-12.3, AC-12.4, AC-16.1, A-13 | P | E | Texto Markdown multilínea de fixture con negrita, lista, enlace y una mención `@ana` enviado con `card create --desc-file` y después con `card update --desc -` (stdin) | El Trello falso recibe la descripción byte a byte en cada escritura; `card get` y `card get --fresh` la devuelven idéntica |
 
 ## Definición de terminado
 

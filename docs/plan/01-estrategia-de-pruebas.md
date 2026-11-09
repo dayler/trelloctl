@@ -11,7 +11,7 @@ Reglas comunes a todos los milestones del [[00-plan-maestro]]. Ninguna prueba au
 
 ## Objetivos
 
-- Un TC automatizado como mínimo por cada AC y RNF del PRD, más los casos negativos de cada fallo previsto y los casos de borde relevantes. Total planificado: 420 TCs (243 positivos, 128 negativos, 49 de borde).
+- Un TC automatizado como mínimo por cada AC y RNF del PRD, más los casos negativos de cada fallo previsto y los casos de borde relevantes. Total planificado: 423 TCs (246 positivos, 128 negativos, 49 de borde).
 - Cobertura mínima del 90 % de líneas y ramas, medida en cada sistema operativo y versión de Python de la matriz.
 - Suite determinista, sin red externa, ejecutable en Windows, Linux y macOS.
 
@@ -62,7 +62,7 @@ El comportamiento del Trello falso se basa en la documentación pública del API
 
 ## Trazabilidad
 
-- Cada TC tiene un id único `TC-Mxx-nnn` en la tabla de su milestone, con los AC o RNF que cubre.
+- Cada TC tiene un id único `TC-Mxx-nnn` en la tabla de su milestone, con los AC o RNF que cubre y, si su resultado esperado depende de una aclaración del plan maestro, su id (`A-n`). El comprobador acepta esas referencias y verifica que la aclaración existe.
 - Cada prueba que automatiza un TC lleva el marcador `tc` con ese id; una prueba puede cubrir varios TCs y un TC puede repartirse en varias pruebas parametrizadas.
 - `tools/check_traceability.py` (M00) comprueba en CI:
   1. Todo AC y RNF del PRD aparece en al menos un TC de algún milestone (normalizando el guion no separable U+2011 que usa el PRD).

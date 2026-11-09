@@ -20,7 +20,7 @@ Documentos relacionados: [[01-estrategia-de-pruebas]] · [[tc-manuales-trello]] 
 | Estado global                     | ⚪       |
 | Ola en curso                      | —       |
 | Milestones completados            | 0 / 17  |
-| TCs automatizados implementados   | 0 / 420 |
+| TCs automatizados implementados   | 0 / 423 |
 | TCs manuales ejecutados           | 0 / 10  |
 | Último milestone fusionado        | —       |
 
@@ -52,14 +52,14 @@ Fases de cada milestone: **F1** implementación · **F2** pruebas unitarias · *
 | [[M07-sincronizacion\|M07 Sincronización y resolución]]   | 4 | M02, M05, M06           | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 41 (21/13/7) | — |
 | [[M13-skills\|M13 Skill]]                                  | 4 | M06                     | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 15 (12/3/0)  | — |
 | [[M08-tablero\|M08 Tablero]]                               | 5 | M02, M07                | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 38 (24/10/4) | — |
-| [[M09-tarjetas\|M09 Tarjetas]]                             | 5 | M02, M07                | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 55 (30/18/7) | — |
+| [[M09-tarjetas\|M09 Tarjetas]]                             | 5 | M02, M07                | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 56 (31/18/7) | — |
 | [[M11-adjuntos\|M11 Adjuntos]]                             | 5 | M07                     | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 20 (10/7/3)  | — |
-| [[M10-detalle-tarjeta\|M10 Detalle de tarjeta]]            | 6 | M09                     | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 38 (23/13/2) | — |
-| [[M12-inbox\|M12 Inbox]]                                   | 6 | M09                     | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 18 (10/7/1)  | — |
+| [[M10-detalle-tarjeta\|M10 Detalle de tarjeta]]            | 6 | M09                     | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 39 (24/13/2) | — |
+| [[M12-inbox\|M12 Inbox]]                                   | 6 | M09                     | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 19 (11/7/1)  | — |
 | [[M14-doctor\|M14 Doctor]]                                 | 7 | M08, M10, M11, M12, M13 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 24 (13/10/1) | — |
 | [[M15-mcp\|M15 Servidor MCP]]                              | 7 | M08, M10, M11, M12      | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 16 (11/4/1)  | — |
 | [[M16-cierre\|M16 Cierre]]                                 | 8 | M14, M15                | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 15 (15/0/0)  | — |
-| **Total**                                                  |   |                         |    |    |    |    |    |    | **420 (243/128/49)** | |
+| **Total**                                                  |   |                         |    |    |    |    |    |    | **423 (246/128/49)** | |
 
 ## Olas de ejecución
 
@@ -150,7 +150,7 @@ El comprobador de trazabilidad verifica en cada ejecución de CI que todo AC y R
 
 ## Aclaraciones de comportamiento
 
-Puntos que el PRD no fija o que necesitan una regla única para escribir los TCs. No modifican el PRD; son vinculantes para la implementación. Todas las fijó el responsable el 2026-11-09 mediante revisión con human in the loop.
+Puntos que el PRD no fija o que necesitan una regla única para escribir los TCs. Los TCs que dependen de una aclaración la citan en su columna AC (por ejemplo, `A-13`). No modifican el PRD; son vinculantes para la implementación. Todas las fijó el responsable el 2026-11-09 mediante revisión con human in the loop.
 
 | Id   | Estado    | Tema                                   | Regla                                                                                                                                                                                                                      | Base en el PRD        |
 | ---- | --------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
@@ -166,6 +166,7 @@ Puntos que el PRD no fija o que necesitan una regla única para escribir los TCs
 | A‑10 | decidida  | Recarga fallida sin datos en caché     | Se devuelve el error original; `CACHE_STALE` solo aplica cuando hay datos que servir.                                                                                                                                      | AC‑22.10              |
 | A‑11 | decidida  | Archivo de entrada inexistente         | `--desc-file`, `--text-file`, `--items-file` o `--file` inexistente o ilegible: `USAGE`.                                                                                                                                   | AC‑12.4, AC‑21.5      |
 | A‑12 | decidida  | Comprobaciones de `doctor` no aplicables | Sin tablero por defecto: `WARN`. Extra MCP ausente: `OK` con "not installed (optional)". Skill no instalado o con versión distinta: `WARN`.                                                                             | AC‑5.2                |
+| A‑13 | decidida  | Texto enriquecido en descripción y comentarios | El texto de `--desc`, `--desc-file`, `--desc -`, `--text`, `--text-file` y `--text -` se envía a Trello tal cual, sin conversión ni validación: Trello lo almacena e interpreta como Markdown (negritas, listas, enlaces, encabezados, código) y las menciones `@username`. HTML no se convierte ni se escapa. Aplica a `card create`, `card update`, `inbox add`, `card comment add` y `card comment edit`. `card get` y `card comments` devuelven el Markdown original. | AC‑12.3, AC‑12.4, AC‑17.2, AC‑17.3, AC‑28.3 |
 
 ## Protocolo de ejecución
 
@@ -232,3 +233,4 @@ El workflow `.github/workflows/ci.yml` corre en cada PR contra `develop` o `main
 | ---------- | ---------------------------------------------------------------------- |
 | 2026-11-09 | Plan creado a partir del PRD v1.0.0; 17 milestones, 420 TCs automatizados |
 | 2026-11-09 | Aclaraciones A‑5 a A‑12 aprobadas por el responsable sin cambios; todas las aclaraciones quedan decididas |
+| 2026-11-09 | Aclaración A‑13 (Markdown en descripción y comentarios) aprobada por el responsable |

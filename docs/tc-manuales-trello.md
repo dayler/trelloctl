@@ -7,7 +7,7 @@ tags: [pruebas, manual, trelloctl]
 
 # trelloctl — TCs manuales contra Trello
 
-Diez casos que se ejecutan a mano contra Trello real, fuera de CI, porque el plan gratuito y sus límites de tasa impiden automatizarlos. Se eligieron donde el Trello falso de la suite automatizada podría diferir del servicio real: contratos que el PRD da por observados, cabeceras de autenticación, búsqueda, recarga incremental, Inbox (no documentado) y la integración con un harness real. Todo lo demás está cubierto por los 420 TCs automatizados del [[00-plan-maestro]].
+Diez casos que se ejecutan a mano contra Trello real, fuera de CI, porque el plan gratuito y sus límites de tasa impiden automatizarlos. Se eligieron donde el Trello falso de la suite automatizada podría diferir del servicio real: contratos que el PRD da por observados, cabeceras de autenticación, búsqueda, recarga incremental, Inbox (no documentado) y la integración con un harness real. Todo lo demás está cubierto por los 423 TCs automatizados del [[00-plan-maestro]].
 
 Se ejecutan en M16 (y de nuevo antes de cada release). Una diferencia entre Trello y el Trello falso se corrige primero en el Trello falso y después en el código.
 

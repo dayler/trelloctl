@@ -89,6 +89,7 @@ Adjuntos (M11).
 | TC-M10-036 | AC-7.4           | N    | E     | Dos checklists `QA` en la tarjeta; dos ítems `e2e` en un checklist                          | `AMBIGUOUS_CHECKLIST`; `AMBIGUOUS_CHECKITEM`, con candidatos                                |
 | TC-M10-037 | AC-7.5           | N    | E     | Checklist inexistente; ítem inexistente                                                     | `CHECKLIST_NOT_FOUND`; `CHECKITEM_NOT_FOUND`                                                |
 | TC-M10-038 | AC-7.2           | B    | E     | Ítem `e2e` en los checklists QA y Release; `item check X QA e2e`                            | Se marca solo el de QA                                                                      |
+| TC-M10-039 | AC-17.2, AC-17.3, A-13 | P | E | Texto Markdown multilínea de fixture con negrita, lista, enlace y una mención `@ana` enviado con `card comment add --text-file` y después con `card comment edit --text -` (stdin) | El Trello falso recibe el texto byte a byte en cada escritura; `card comments` lo devuelve idéntico |
 
 ## Definición de terminado
 

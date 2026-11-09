@@ -69,6 +69,7 @@ Cualquier otra operación entre tableros (PRD §9).
 | TC-M12-016 | AC-28.4           | N    | E     | Lista destino inexistente                                                               | `LIST_NOT_FOUND`, 0 escrituras                                                                         |
 | TC-M12-017 | AC-28.4           | N    | E     | `--pos 9` en una lista de 3 tarjetas (A‑3)                                              | `USAGE`                                                                                                |
 | TC-M12-018 | AC-28.7           | P    | E     | `card get`, `card update --labels` y `card done` con el id de una tarjeta del Inbox, sin `--board` | Funcionan con el contexto del tablero Inbox                                                   |
+| TC-M12-019 | AC-28.3, A-13     | P    | E     | Texto Markdown multilínea de fixture con negrita, lista, enlace y una mención `@ana` enviado con `inbox add --desc-file` | El Trello falso recibe la descripción byte a byte; `card get` de la tarjeta del Inbox la devuelve idéntica |
 
 ## Definición de terminado
 
