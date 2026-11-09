@@ -1,7 +1,7 @@
 ---
 id: M03
 title: Configuración — lectura, precedencia y escritor de [board]
-status: pending
+status: in_review
 wave: 2
 depends_on: [M01]
 branch: feature/m03-configuracion
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M03 — Configuración: lectura, precedencia y escritor de `[board]`
 
-**Estado:** ⚪ Pendiente · **Ola:** 2 · **Depende de:** M01 · **Rama:** `feature/m03-configuracion`
+**Estado:** 🔵 En revisión · **Ola:** 2 · **Depende de:** M01 · **Rama:** `feature/m03-configuracion`
 
 ## Objetivo
 
@@ -40,10 +40,10 @@ Comandos `config *` (M06), resolución de tableros por nombre (M07).
 
 | Fase | Descripción                                                     | Estado |
 | ---- | --------------------------------------------------------------- | ------ |
-| F1   | Implementación                                                  | ⚪      |
-| F2   | Pruebas unitarias                                               | ⚪      |
-| F3   | TCs automatizados                                               | ⚪      |
-| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | ⚪      |
+| F1   | Implementación                                                  | 🟢      |
+| F2   | Pruebas unitarias                                               | 🟢      |
+| F3   | TCs automatizados                                               | 🟢      |
+| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | 🟢      |
 | F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪      |
 
 ## Casos de prueba automatizados
@@ -80,3 +80,6 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 
 | Fecha | Evento |
 | ----- | ------ |
+| 2026-11-09 | F1-F3: `infra/settings.py` (carga, precedencia, validación, escritor de `[board]`), 21 TCs automatizados y verificados uno a uno, pruebas unitarias |
+| 2026-11-09 | F4: ruff check, ruff format --check, mypy, pytest (110 pruebas, cobertura 98,92 %) y trazabilidad en verde; en `settings.py` 98 % |
+| 2026-11-09 | F5 pendiente: solo en local, PR y CI a la espera de confirmación del usuario |
