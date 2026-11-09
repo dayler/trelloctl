@@ -18,11 +18,11 @@ Documentos relacionados: [[01-estrategia-de-pruebas]] · [[tc-manuales-trello]] 
 | Indicador                       | Valor               |
 | ------------------------------- | ------------------- |
 | Estado global                   | 🟡                  |
-| Ola en curso                    | 7                   |
+| Ola en curso                    | 8                   |
 | Milestones completados          | 0 / 17              |
-| TCs automatizados implementados | 393 / 451          |
+| TCs automatizados implementados | 437 / 451          |
 | TCs manuales ejecutados         | 0 / 11              |
-| Último milestone fusionado      | M10 (local, sin PR) |
+| Último milestone fusionado      | M14 (local, sin PR) |
 
 ### Leyenda de semáforos
 
@@ -56,9 +56,9 @@ Fases de cada milestone: **F1** implementación · **F2** pruebas unitarias · *
 | [[M11-adjuntos\|M11 Adjuntos]]                             | 5 | M07                     | 🟢 | 🟢 | 🟢 | 🟢 | ⚪ | 🔵 | 21 (10/8/3) | — |
 | [[M10-detalle-tarjeta\|M10 Detalle de tarjeta]]            | 6 | M09                     | 🟢 | 🟢 | 🟢 | 🟢 | ⚪ | 🔵 | 39 (24/13/2) | — |
 | [[M12-inbox\|M12 Inbox]]                                   | 6 | M09                     | 🟢 | 🟢 | 🟢 | 🟢 | ⚪ | 🔵 | 19 (11/7/1) | — |
-| [[M14-doctor\|M14 Doctor]]                                 | 7 | M08, M10, M11, M12, M13 | 🟡 | ⚪ | ⚪ | ⚪ | ⚪ | 🟡 | 25 (13/10/2) | — |
-| [[M15-mcp\|M15 Servidor MCP]]                              | 7 | M08, M10, M11, M12, M13 | 🟡 | ⚪ | ⚪ | ⚪ | ⚪ | 🟡 | 19 (12/6/1) | — |
-| [[M16-cierre\|M16 Cierre]]                                 | 8 | M14, M15                | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 14 (14/0/0) | — |
+| [[M14-doctor\|M14 Doctor]]                                 | 7 | M08, M10, M11, M12, M13 | 🟢 | 🟢 | 🟢 | 🟢 | ⚪ | 🔵 | 25 (13/10/2) | — |
+| [[M15-mcp\|M15 Servidor MCP]]                              | 7 | M08, M10, M11, M12, M13 | 🟢 | 🟢 | 🟢 | 🟢 | ⚪ | 🔵 | 19 (12/6/1) | — |
+| [[M16-cierre\|M16 Cierre]]                                 | 8 | M14, M15                | 🟡 | ⚪ | ⚪ | ⚪ | ⚪ | 🟡 | 14 (14/0/0) | — |
 | **Total**                                                  |   |                         |    |    |    |    |    |    | **451 (255/136/60)** | |
 
 ## Olas de ejecución
@@ -74,8 +74,8 @@ Una ola agrupa milestones sin dependencias entre sí; sus subagentes trabajan en
 | 4   | M07, M13           | 2                      | 🔵      |
 | 5   | M08, M09, M11      | 3                      | 🔵      |
 | 6   | M10, M12           | 2                      | 🔵      |
-| 7   | M14, M15           | 2                      | 🟡      |
-| 8   | M16                | 1                      | ⚪      |
+| 7   | M14, M15           | 2                      | 🔵      |
+| 8   | M16                | 1                      | 🟡      |
 
 ## Grafo de dependencias
 
@@ -121,7 +121,6 @@ flowchart LR
     classDef in_review fill:#bfdbfe,stroke:#1d4ed8,color:#111827
     classDef done fill:#bbf7d0,stroke:#15803d,color:#111827
     classDef blocked fill:#fecaca,stroke:#b91c1c,color:#111827
-    class M16 pending
     class M00 in_review
     class M01 in_review
     class M02,M03,M04 in_review
@@ -129,7 +128,8 @@ flowchart LR
     class M07,M13 in_review
     class M08,M09,M11 in_review
     class M10,M12 in_review
-    class M14,M15 in_progress
+    class M14,M15 in_review
+    class M16 in_progress
 ```
 
 ## Cobertura del PRD por milestone
@@ -290,3 +290,4 @@ El workflow `.github/workflows/ci.yml` corre en cada PR contra `develop` o `main
 | 2026-11-09 | Ola 4 (M07, M13) verificada y fusionada en `develop` en local (sin PR ni CI): 66 TCs; suite integrada 432 pruebas, cobertura 98,6 %. M07 cambió TC-M06-022 (`config board set` con valor no id resuelve por nombre, AC-1.10). PR previo pequeño en infra: `Cache.touch_cards` público; prueba de wheel de M13 comparada en bytes (autocrlf). Ola 5 (M08, M09, M11) en curso |
 | 2026-11-09 | Ola 5 (M08, M09, M11) verificada y fusionada en `develop` en local (sin PR ni CI): 123 TCs; suite integrada 755 pruebas, cobertura 99,0 %. M08 y M09 modificaron `tests/fakes/trello/core.py` (enrutador del Trello falso; fuera de su lista) y su conflicto se resolvió combinando ambos cambios. Ola 6 (M10, M12) en curso |
 | 2026-11-09 | Ola 6 (M10, M12) verificada y fusionada en `develop` en local (sin PR ni CI): 58 TCs; suite integrada 869 pruebas, cobertura 99,0 %. Ola 7 (M14, M15) en curso |
+| 2026-11-09 | Ola 7 (M14, M15) verificada y fusionada en `develop` en local (sin PR ni CI): 44 TCs; suite integrada 960 pruebas, cobertura 98,6 %. M15 fija `mcp>=2.3,<2.4`. Ola 8 (M16) en curso |
