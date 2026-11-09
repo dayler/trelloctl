@@ -386,7 +386,69 @@ def _cache() -> list[Operation]:
 
 
 # ==== BEGIN block: skills ====
-# M13 adds the `skills` operations here.
+@block("skills")
+def _skills() -> list[Operation]:
+    from trelloctl.app.commands import skills as cmd
+
+    return [
+        Operation(
+            ("skills", "list"),
+            "list the skills shipped with trelloctl",
+            "trelloctl skills list",
+            cmd.list_skills,
+            mcp=False,
+        ),
+        Operation(
+            ("skills", "install"),
+            "install the skill for a harness (only claude)",
+            "trelloctl skills install --harness claude --scope user",
+            cmd.install,
+            params=(
+                Param(
+                    "harness",
+                    "harness to install for (only claude)",
+                    required=True,
+                    choices=cmd.HARNESSES,
+                ),
+                Param(
+                    "scope",
+                    "user (default) or project",
+                    choices=cmd.SCOPES,
+                    exclusive="target",
+                ),
+                Param(
+                    "dir",
+                    "directory that receives SKILL.md",
+                    metavar="PATH",
+                    exclusive="target",
+                ),
+                Param("force", "overwrite an existing SKILL.md", ParamType.BOOL),
+            ),
+            description=(
+                "Copy the skill to ~/.claude/skills/trelloctl/ (default), "
+                "./.claude/skills/trelloctl/ or the given directory. "
+                "An existing SKILL.md is not overwritten without --force."
+            ),
+            mcp=False,
+        ),
+        Operation(
+            ("skills", "export"),
+            "write SKILL.md to a directory, for other harnesses",
+            "trelloctl skills export --dir ./skill",
+            cmd.export,
+            params=(
+                Param(
+                    "dir",
+                    "directory that receives SKILL.md",
+                    required=True,
+                    metavar="PATH",
+                ),
+            ),
+            mcp=False,
+        ),
+    ]
+
+
 # ==== END block: skills ====
 
 
