@@ -18,11 +18,11 @@ Documentos relacionados: [[01-estrategia-de-pruebas]] · [[tc-manuales-trello]] 
 | Indicador                       | Valor               |
 | ------------------------------- | ------------------- |
 | Estado global                   | 🟡                  |
-| Ola en curso                    | 3                   |
+| Ola en curso                    | 4                   |
 | Milestones completados          | 0 / 17              |
-| TCs automatizados implementados | 96 / 451           |
+| TCs automatizados implementados | 146 / 451          |
 | TCs manuales ejecutados         | 0 / 11              |
-| Último milestone fusionado      | M04 (local, sin PR) |
+| Último milestone fusionado      | M06 (local, sin PR) |
 
 ### Leyenda de semáforos
 
@@ -47,10 +47,10 @@ Fases de cada milestone: **F1** implementación · **F2** pruebas unitarias · *
 | [[M02-dominio\|M02 Dominio]]                               | 2 | M01                     | 🟢 | 🟢 | 🟢 | 🟢 | ⚪ | 🔵 | 22 (9/4/9) | — |
 | [[M03-configuracion\|M03 Configuración]]                   | 2 | M01                     | 🟢 | 🟢 | 🟢 | 🟢 | ⚪ | 🔵 | 21 (10/6/5) | — |
 | [[M04-cliente-http\|M04 Cliente HTTP]]                     | 2 | M01                     | 🟢 | 🟢 | 🟢 | 🟢 | ⚪ | 🔵 | 21 (7/12/2) | — |
-| [[M05-cache\|M05 Caché SQLite]]                            | 3 | M01, M02                | 🟡 | ⚪ | ⚪ | ⚪ | ⚪ | 🟡 | 17 (12/2/3) | — |
-| [[M06-cli\|M06 Registro, CLI y config]]                    | 3 | M01, M03, M04           | 🟡 | ⚪ | ⚪ | ⚪ | ⚪ | 🟡 | 33 (21/11/1) | — |
-| [[M07-sincronizacion\|M07 Sincronización y resolución]]   | 4 | M02, M05, M06           | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 51 (25/15/11) | — |
-| [[M13-skills\|M13 Skill]]                                  | 4 | M06                     | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 15 (12/3/0) | — |
+| [[M05-cache\|M05 Caché SQLite]]                            | 3 | M01, M02                | 🟢 | 🟢 | 🟢 | 🟢 | ⚪ | 🔵 | 17 (12/2/3) | — |
+| [[M06-cli\|M06 Registro, CLI y config]]                    | 3 | M01, M03, M04           | 🟢 | 🟢 | 🟢 | 🟢 | ⚪ | 🔵 | 33 (21/11/1) | — |
+| [[M07-sincronizacion\|M07 Sincronización y resolución]]   | 4 | M02, M05, M06           | 🟡 | ⚪ | ⚪ | ⚪ | ⚪ | 🟡 | 51 (25/15/11) | — |
+| [[M13-skills\|M13 Skill]]                                  | 4 | M06                     | 🟡 | ⚪ | ⚪ | ⚪ | ⚪ | 🟡 | 15 (12/3/0) | — |
 | [[M08-tablero\|M08 Tablero]]                               | 5 | M02, M07                | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 41 (24/12/5) | — |
 | [[M09-tarjetas\|M09 Tarjetas]]                             | 5 | M02, M07                | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 61 (33/18/10) | — |
 | [[M11-adjuntos\|M11 Adjuntos]]                             | 5 | M07                     | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 21 (10/8/3) | — |
@@ -70,8 +70,8 @@ Una ola agrupa milestones sin dependencias entre sí; sus subagentes trabajan en
 | 0   | M00                | 1                      | 🔵      |
 | 1   | M01                | 1                      | 🔵      |
 | 2   | M02, M03, M04      | 3                      | 🔵      |
-| 3   | M05, M06           | 2                      | 🟡      |
-| 4   | M07, M13           | 2                      | ⚪      |
+| 3   | M05, M06           | 2                      | 🔵      |
+| 4   | M07, M13           | 2                      | 🟡      |
 | 5   | M08, M09, M11      | 3                      | ⚪      |
 | 6   | M10, M12           | 2                      | ⚪      |
 | 7   | M14, M15           | 2                      | ⚪      |
@@ -121,11 +121,12 @@ flowchart LR
     classDef in_review fill:#bfdbfe,stroke:#1d4ed8,color:#111827
     classDef done fill:#bbf7d0,stroke:#15803d,color:#111827
     classDef blocked fill:#fecaca,stroke:#b91c1c,color:#111827
-    class M07,M08,M09,M10,M11,M12,M13,M14,M15,M16 pending
+    class M08,M09,M10,M11,M12,M14,M15,M16 pending
     class M00 in_review
     class M01 in_review
     class M02,M03,M04 in_review
-    class M05,M06 in_progress
+    class M05,M06 in_review
+    class M07,M13 in_progress
 ```
 
 ## Cobertura del PRD por milestone
@@ -282,3 +283,4 @@ El workflow `.github/workflows/ci.yml` corre en cada PR contra `develop` o `main
 | 2026-11-09 | M00 verificado y fusionado en `develop` en local (sin PR ni CI): 13 TCs, cobertura 100 %, seis controles en verde; M01 en curso |
 | 2026-11-09 | M01 verificado y fusionado en `develop` en local (sin PR ni CI): 19 TCs, cobertura 99,6 %; ola 2 (M02, M03, M04) en curso |
 | 2026-11-09 | Ola 2 (M02, M03, M04) verificada y fusionada en `develop` en local (sin PR ni CI): 64 TCs; suite integrada 189 pruebas, cobertura 99,3 %. M04 añadió `tests/acceptance/conftest.py` (fuera de su lista) como mitigación de `HTTPError` sin cerrar en pruebas de M00; ola 3 (M05, M06) en curso |
+| 2026-11-09 | Ola 3 (M05, M06) verificada y fusionada en `develop` en local (sin PR ni CI): 50 TCs; suite integrada 290 pruebas (1 omitida: TC-M06-013, solo POSIX), cobertura 98,9 %; ola 4 (M07, M13) en curso |
