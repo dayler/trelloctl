@@ -18,11 +18,11 @@ Documentos relacionados: [[01-estrategia-de-pruebas]] · [[tc-manuales-trello]] 
 | Indicador                         | Valor   |
 | --------------------------------- | ------- |
 | Estado global                     | 🟡       |
-| Ola en curso                      | 0       |
+| Ola en curso                      | 1       |
 | Milestones completados            | 0 / 17  |
-| TCs automatizados implementados   | 0 / 451 |
+| TCs automatizados implementados   | 13 / 451 |
 | TCs manuales ejecutados           | 0 / 11  |
-| Último milestone fusionado        | —       |
+| Último milestone fusionado        | M00 (local, sin PR) |
 
 ### Leyenda de semáforos
 
@@ -42,8 +42,8 @@ Fases de cada milestone: **F1** implementación · **F2** pruebas unitarias · *
 
 | Milestone                          | Ola | Depende de                  | F1 | F2 | F3 | F4 | F5 | Estado | TCs (P/N/B)     | PR |
 | ---------------------------------- | --- | --------------------------- | -- | -- | -- | -- | -- | ------ | --------------- | -- |
-| [[M00-bootstrap\|M00 Bootstrap y arnés de pruebas]]       | 0 | —                       | 🟡 | ⚪ | ⚪ | ⚪ | ⚪ | 🟡 | 13 (6/5/2) | — |
-| [[M01-fundamentos\|M01 Fundamentos]]                       | 1 | M00                     | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 19 (12/4/3) | — |
+| [[M00-bootstrap\|M00 Bootstrap y arnés de pruebas]]       | 0 | —                       | 🟢 | 🟢 | 🟢 | 🟢 | ⚪ | 🔵 | 13 (6/5/2) | — |
+| [[M01-fundamentos\|M01 Fundamentos]]                       | 1 | M00                     | 🟡 | ⚪ | ⚪ | ⚪ | ⚪ | 🟡 | 19 (12/4/3) | — |
 | [[M02-dominio\|M02 Dominio]]                               | 2 | M01                     | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 22 (9/4/9) | — |
 | [[M03-configuracion\|M03 Configuración]]                   | 2 | M01                     | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 21 (10/6/5) | — |
 | [[M04-cliente-http\|M04 Cliente HTTP]]                     | 2 | M01                     | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 21 (7/12/2) | — |
@@ -67,8 +67,8 @@ Una ola agrupa milestones sin dependencias entre sí; sus subagentes trabajan en
 
 | Ola | Milestones         | Subagentes en paralelo | Estado |
 | --- | ------------------ | ---------------------- | ------ |
-| 0   | M00                | 1                      | 🟡      |
-| 1   | M01                | 1                      | ⚪      |
+| 0   | M00                | 1                      | 🔵      |
+| 1   | M01                | 1                      | 🟡      |
 | 2   | M02, M03, M04      | 3                      | ⚪      |
 | 3   | M05, M06           | 2                      | ⚪      |
 | 4   | M07, M13           | 2                      | ⚪      |
@@ -121,8 +121,9 @@ flowchart LR
     classDef in_review fill:#bfdbfe,stroke:#1d4ed8,color:#111827
     classDef done fill:#bbf7d0,stroke:#15803d,color:#111827
     classDef blocked fill:#fecaca,stroke:#b91c1c,color:#111827
-    class M01,M02,M03,M04,M05,M06,M07,M08,M09,M10,M11,M12,M13,M14,M15,M16 pending
-    class M00 in_progress
+    class M02,M03,M04,M05,M06,M07,M08,M09,M10,M11,M12,M13,M14,M15,M16 pending
+    class M00 in_review
+    class M01 in_progress
 ```
 
 ## Cobertura del PRD por milestone
@@ -276,3 +277,4 @@ El workflow `.github/workflows/ci.yml` corre en cada PR contra `develop` o `main
 | 2026-11-09 | Aclaración A-24 (`--include-archived-boards`) decidida por el responsable; caché de tableros desaparecidos anotado para conciliación con el PRD (+6 TCs) |
 | 2026-11-09 | Segunda revisión independiente: A-25 y ampliaciones de A-15, A-19 y A-22 resueltas con la opción más sencilla; inventario de endpoints movido a M14; localización de tarjetas sin tablero en M07; TCs ajustados (+5 netos) |
 | 2026-11-09 | El responsable decide que `README.md` va en español (única excepción fuera de `docs/`) y queda excluido de la comprobación RNF-10; ajustados `CLAUDE.md`, M15 y M16 |
+| 2026-11-09 | M00 verificado y fusionado en `develop` en local (sin PR ni CI): 13 TCs, cobertura 100 %, seis controles en verde; M01 en curso |
