@@ -55,15 +55,28 @@ class _IsoUtcFormatter(logging.Formatter):
 class SafeRotatingFileHandler(RotatingFileHandler):
     """Rotating handler that keeps writing when the rotation fails (locked file)."""
 
+    _reporting_failure = False
+
+    def shouldRollover(self, record: logging.LogRecord) -> bool:
+        # The failure warning goes through this same handler; without this guard
+        # it would try to rotate again, fail again and recurse without end.
+        if self._reporting_failure:
+            return False
+        return bool(super().shouldRollover(record))
+
     def doRollover(self) -> None:
         try:
             super().doRollover()
         except OSError as exc:
             if self.stream is None:
                 self.stream = self._open()
-            logging.getLogger(LOGGER_NAME).warning(
-                "Log rotation failed (%s); continuing without rotating.", exc
-            )
+            self._reporting_failure = True
+            try:
+                logging.getLogger(LOGGER_NAME).warning(
+                    "Log rotation failed (%s); continuing without rotating.", exc
+                )
+            finally:
+                self._reporting_failure = False
 
 
 def _close_handlers(logger: logging.Logger) -> None:
