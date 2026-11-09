@@ -11,7 +11,7 @@ Reglas comunes a todos los milestones del [[00-plan-maestro]]. Ninguna prueba au
 
 ## Objetivos
 
-- Un TC automatizado como mínimo por cada AC y RNF del PRD, más los casos negativos de cada fallo previsto y los casos de borde relevantes. Total planificado: 423 TCs (246 positivos, 128 negativos, 49 de borde).
+- Un TC automatizado como mínimo por cada AC y RNF del PRD, más los casos negativos de cada fallo previsto y los casos de borde relevantes. Total planificado: 451 TCs (255 positivos, 136 negativos, 60 de borde).
 - Cobertura mínima del 90 % de líneas y ramas, medida en cada sistema operativo y versión de Python de la matriz.
 - Suite determinista, sin red externa, ejecutable en Windows, Linux y macOS.
 
@@ -35,7 +35,7 @@ Sustituye la capa de transporte del cliente HTTP (M04). Devuelve respuestas prog
 
 ### Trello falso (TCs)
 
-Servidor HTTP de la biblioteca estándar que escucha en `127.0.0.1` en un puerto efímero por prueba. La configuración de la prueba apunta `http.base_url` a él, como permite AC‑23.6.
+Servidor HTTP de la biblioteca estándar que escucha en `127.0.0.1` en un puerto efímero por prueba. La configuración de la prueba apunta `http.base_url` a él, como permite AC-23.6.
 
 | Capacidad                    | Detalle                                                                                                                                  | Milestone       |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
@@ -59,27 +59,28 @@ El comportamiento del Trello falso se basa en la documentación pública del API
 - Una guardia de red automática hace fallar cualquier prueba que intente conectar con un host distinto de loopback.
 - Los TTL se prueban con un reloj inyectable, nunca con esperas reales, salvo en el nivel M, donde se configura un TTL de un segundo.
 - Las pruebas específicas de una plataforma (permisos POSIX) se omiten de forma explícita en las demás.
+- La guardia de red actúa en el proceso de pytest. En los niveles S y M el subproceso recibe una configuración cuyo `base_url` apunta al Trello falso, y esos TCs no usan comandos que contacten otros hosts.
 
 ## Trazabilidad
 
-- Cada TC tiene un id único `TC-Mxx-nnn` en la tabla de su milestone, con los AC o RNF que cubre y, si su resultado esperado depende de una aclaración del plan maestro, su id (`A-n`). El comprobador acepta esas referencias y verifica que la aclaración existe.
+- Cada TC tiene un id único `TC-Mxx-nnn` en la tabla de su milestone, con los AC o RNF que cubre y, si su resultado esperado depende de una aclaración del plan maestro, su id (`A-n`). El comprobador acepta esas referencias y verifica que la aclaración existe. La columna admite además referencias a secciones del PRD (`§10.3`) en TCs de arquitectura y el valor `infra` en los TCs del arnés de M00.
 - Cada prueba que automatiza un TC lleva el marcador `tc` con ese id; una prueba puede cubrir varios TCs y un TC puede repartirse en varias pruebas parametrizadas.
 - `tools/check_traceability.py` (M00) comprueba en CI:
-  1. Todo AC y RNF del PRD aparece en al menos un TC de algún milestone (normalizando el guion no separable U+2011 que usa el PRD).
-  2. Todo TC de un milestone con `status: done` tiene al menos una prueba marcada.
+  1. Todo AC y RNF del PRD aparece en al menos un TC de algún milestone o de [[tc-manuales-trello]] (RNF-2 solo se verifica a mano, A-18), normalizando el guion no separable U+2011 que usa el PRD.
+  2. Todo TC de un milestone con `status: in_review` o `done` tiene al menos una prueba marcada, de modo que el PR del milestone ya lo exige.
   3. Ningún marcador `tc` apunta a un TC inexistente.
   4. Ningún milestone `done` tiene dependencias que no estén `done`.
   5. Las discrepancias de semáforo entre el plan maestro y los milestones se notifican como aviso, no como fallo, porque el orquestador actualiza el plan maestro después de cada merge.
-- En M16 el comprobador se ejecuta en modo estricto: todos los TCs de todos los milestones con prueba.
+- No hay un modo estricto aparte: al fusionar M16 todos los milestones están `done` y la regla 2 exige prueba para todos los TCs.
 
 ## Cobertura
 
 - Medida con `pytest-cov`, de líneas y de ramas, sobre el paquete `trelloctl`.
 - Umbral del 90 % aplicado a la suite completa en cada job de la matriz; el job falla por debajo.
 - Exclusiones admitidas: bloques solo para el verificador de tipos y la guarda de ejecución como script. No se usan exclusiones para esquivar el umbral.
-- El código específico de una plataforma es mínimo por diseño (AC‑27.1), por lo que el umbral se cumple en los tres sistemas operativos sin combinar informes.
+- El código específico de una plataforma es mínimo por diseño (AC-27.1), por lo que el umbral se cumple en los tres sistemas operativos sin combinar informes.
 
-## Comprobaciones de idioma (RNF‑10)
+## Comprobaciones de idioma (RNF-10)
 
 Una heurística común, usada en M13 y M16, rechaza en los textos emitidos o instalados los caracteres propios del español (á, é, í, ó, ú, ñ, ¿, ¡) y una lista corta de palabras funcionales españolas. Los datos de prueba con caracteres no ASCII se excluyen porque son contenido del usuario, no texto de la herramienta.
 
@@ -98,7 +99,7 @@ Workflow `.github/workflows/ci.yml`, ajustado al plan gratuito de GitHub Actions
 | `detect`           | Siempre                                | Ubuntu                              | Detecta si existe `pyproject.toml`; sin él, los demás jobs se omiten (estado previo a M00) |
 | `checks`           | Si existe el paquete                   | Ubuntu, Python 3.12                 | Lint, formato, tipado estricto y comprobador de trazabilidad                             |
 | `tests`            | Tras `checks`                          | PR y `main`: 3 SO × Python 3.12, 3.13, 3.14 (9 jobs). Push a `develop`: Ubuntu, Python 3.12 | UT y TCs automatizados contra el Trello falso, con el umbral de cobertura |
-| `package`          | Tras `checks`                          | Ubuntu, Python 3.12                 | Construye el wheel, lo instala sin extras en un entorno limpio y verifica RNF‑1 y A‑1    |
+| `package`          | Tras `checks`                          | Ubuntu, Python 3.12                 | Construye el wheel, lo instala sin extras en un entorno limpio y verifica RNF-1 y A-1 (la comprobación de A-1 solo es significativa desde M15; antes `mcp serve` no existe y argparse ya devuelve 2) |
 
 Medidas de ahorro de minutos:
 
