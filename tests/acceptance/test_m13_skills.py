@@ -79,8 +79,9 @@ def test_wheel_includes_the_skill(tmp_path: Path) -> None:
     assert len(wheels) == 1
     with zipfile.ZipFile(wheels[0]) as wheel:
         assert "trelloctl/skills/trelloctl/SKILL.md" in wheel.namelist()
-        packaged = wheel.read("trelloctl/skills/trelloctl/SKILL.md").decode("utf-8")
-    assert packaged == SKILL_FILE.read_text(encoding="utf-8")
+        packaged = wheel.read("trelloctl/skills/trelloctl/SKILL.md")
+    # Compare bytes: the wheel carries the checkout copy, whatever its line endings.
+    assert packaged == SKILL_FILE.read_bytes()
 
 
 @pytest.mark.tc("TC-M13-004")
