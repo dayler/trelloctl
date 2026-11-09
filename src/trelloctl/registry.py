@@ -1347,7 +1347,28 @@ def _skills() -> list[Operation]:
 
 
 # ==== BEGIN block: mcp ====
-# M15 adds the `mcp serve` operation here (own_stdout=True).
+@block("mcp")
+def _mcp() -> list[Operation]:
+    from trelloctl import mcp_server
+
+    return [
+        Operation(
+            ("mcp", "serve"),
+            "run the MCP server over stdio (experimental)",
+            "trelloctl mcp serve",
+            mcp_server.serve,
+            description=(
+                "Experimental. Serve the operations as MCP tools over stdio until the client "
+                "closes standard input. Needs the extra: uv tool install 'trelloctl[mcp]'. "
+                "The configuration is read once at startup; stdout carries only protocol "
+                "messages."
+            ),
+            mcp=False,
+            own_stdout=True,
+        ),
+    ]
+
+
 # ==== END block: mcp ====
 
 

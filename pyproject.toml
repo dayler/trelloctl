@@ -29,8 +29,8 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
-# Optional MCP server. M15 pins the version range of the official SDK.
-mcp = ["mcp"]
+# Optional MCP server. Pinned range of the official SDK (it publishes breaking changes in minor releases).
+mcp = ["mcp>=2.3,<2.4"]
 
 [project.scripts]
 trelloctl = "trelloctl.cli:main"
