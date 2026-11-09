@@ -1,7 +1,7 @@
 ---
 id: M16
 title: Cierre — requisitos no funcionales, completitud y release candidata
-status: pending
+status: in_progress
 wave: 8
 depends_on: [M14, M15]
 branch: feature/m16-cierre
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M16 — Cierre: requisitos no funcionales, completitud y release candidata
 
-**Estado:** ⚪ Pendiente · **Ola:** 8 · **Depende de:** M14, M15 (y por transitividad todos) · **Rama:** `feature/m16-cierre`
+**Estado:** 🟡 En curso · **Ola:** 8 · **Depende de:** M14, M15 (y por transitividad todos) · **Rama:** `feature/m16-cierre`
 
 ## Objetivo
 
@@ -41,8 +41,8 @@ Publicación en PyPI y merge a `main` (decisión del responsable tras este miles
 
 | Fase | Descripción                                                     | Estado |
 | ---- | --------------------------------------------------------------- | ------ |
-| F1   | Implementación (README y ajustes de cierre)                     | ⚪      |
-| F2   | Pruebas unitarias                                               | ⚪      |
+| F1   | Implementación (README y ajustes de cierre)                     | 🟢      |
+| F2   | Pruebas unitarias                                               | 🟡      |
 | F3   | TCs automatizados                                               | ⚪      |
 | F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad estricta | ⚪ |
 | F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪      |
@@ -74,3 +74,4 @@ La común del [[00-plan-maestro#Definición de terminado común]], más: comprob
 
 | Fecha | Evento |
 | ----- | ------ |
+| 2026-11-09 | F1 hecha: README reescrito en español (instalación, configuración, credenciales, tablero, ejemplos, MCP experimental, licencia) y ejemplos del SKILL.md alineados con la salida real (`matched`/`comment_ids`, `card move` con `from`/`to`/`card`, envolturas `lists`/`labels`/`members`/`actions`, `card comment add --text`, `card get --full`) |
