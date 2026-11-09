@@ -1,7 +1,7 @@
 ---
 id: M02
 title: Dominio — modelos, mover y clasificación de identificadores
-status: in_review
+status: done
 wave: 2
 depends_on: [M01]
 branch: feature/m02-dominio
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M02 — Dominio: modelos, mover y clasificación de identificadores
 
-**Estado:** 🔵 En revisión · **Ola:** 2 · **Depende de:** M01 · **Rama:** `feature/m02-dominio`
+**Estado:** 🟢 Completado · **Ola:** 2 · **Depende de:** M01 · **Rama:** `feature/m02-dominio`
 
 ## Objetivo
 
@@ -43,7 +43,7 @@ Resolución contra caché o Trello (M07).
 | F2   | Pruebas unitarias                                               | 🟢     |
 | F3   | TCs automatizados                                               | 🟢     |
 | F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | 🟢     |
-| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪ local only: PR and CI pending user confirmation |
+| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | 🟢 |
 
 ## Casos de prueba automatizados
 
@@ -81,3 +81,4 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 | Fecha | Evento |
 | ----- | ------ |
 | 2026-11-09 | Implementación de `domain/models.py` y `domain/mover.py`; 22/22 TCs automatizados y verificados uno a uno (nivel C). Compuertas locales: ruff check, ruff format --check, mypy, pytest (107 pruebas, cobertura 99,82 %) y trazabilidad, todas en verde. F5 pendiente: solo local, PR y CI a la espera de confirmación del usuario |
+| 2026-11-09 | F5: PR #3 fusionado en `develop` con merge commit, CI en verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14. Estado: `done`. |

@@ -1,7 +1,7 @@
 ---
 id: M10
 title: Detalle de tarjeta — comentarios, etiquetas, miembros y checklists
-status: in_review
+status: done
 wave: 6
 depends_on: [M09]
 branch: feature/m10-detalle-tarjeta
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M10 — Detalle de tarjeta: comentarios, etiquetas, miembros y checklists
 
-**Estado:** 🔵 En revisión · **Ola:** 6 · **Depende de:** M09 · **Rama:** `feature/m10-detalle-tarjeta`
+**Estado:** 🟢 Completado · **Ola:** 6 · **Depende de:** M09 · **Rama:** `feature/m10-detalle-tarjeta`
 
 ## Objetivo
 
@@ -45,7 +45,7 @@ Adjuntos (M11).
 | F2   | Pruebas unitarias                                               | 🟢      |
 | F3   | TCs automatizados                                               | 🟢      |
 | F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | 🟢      |
-| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪      |
+| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | 🟢 |
 
 ## Casos de prueba automatizados
 
@@ -104,3 +104,4 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 | 2026-11-09 | Nota: `card checklist item check` y `uncheck` declara `items` como posicional opcional (`nargs="?"`) para admitir `--all`; las respuestas de checklist añaden `progress`, `checked` y `total` |
 | 2026-11-09 | F4: ruff check, ruff format --check, mypy, pytest con cobertura y trazabilidad en verde (ver informe final) |
 | 2026-11-09 | F5 pendiente: solo local, PR y CI a la espera de confirmación del usuario |
+| 2026-11-09 | F5: PR #15 fusionado en `develop` con merge commit, CI en verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14. Estado: `done`. |
