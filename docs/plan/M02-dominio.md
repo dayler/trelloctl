@@ -80,5 +80,5 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 
 | Fecha | Evento |
 | ----- | ------ |
-| 2026-11-09 | Implementación de `domain/models.py` y `domain/mover.py`; 22/22 TCs automatizados y verificados uno a uno (nivel C). Compuertas locales: ruff check, ruff format --check, mypy, pytest (107 pruebas, cobertura 99,82 %) y trazabilidad, todas en verde. F5 pendiente: solo local, PR y CI a la espera de confirmación del usuario |
+| 2026-11-09 | Implementación de `domain/models.py` y `domain/mover.py`; 22/22 TCs automatizados y verificados uno a uno (nivel C). Compuertas locales: ruff check, ruff format --check, mypy, pytest (107 pruebas, cobertura 99,82 %) y trazabilidad, todas en verde. |
 | 2026-11-09 | F5: PR #3 fusionado en `develop` con merge commit, CI en verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14. Estado: `done`. |

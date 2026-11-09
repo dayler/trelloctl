@@ -82,5 +82,4 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 | ----- | ------ |
 | 2026-11-09 | F1-F3: `infra/settings.py` (carga, precedencia, validación, escritor de `[board]`), 21 TCs automatizados y verificados uno a uno, pruebas unitarias |
 | 2026-11-09 | F4: ruff check, ruff format --check, mypy, pytest (110 pruebas, cobertura 98,92 %) y trazabilidad en verde; en `settings.py` 98 % |
-| 2026-11-09 | F5 pendiente: solo en local, PR y CI a la espera de confirmación del usuario |
 | 2026-11-09 | F5: PR #4 fusionado en `develop` con merge commit, CI en verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14. Estado: `done`. |

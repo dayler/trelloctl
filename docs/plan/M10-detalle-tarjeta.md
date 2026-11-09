@@ -103,5 +103,4 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 | 2026-11-09 | F3: 39 de 39 TCs automatizados (nivel E) con Trello falso ampliado: `comments_write.py`, `card_relations.py`, `checklists.py`; verificados uno a uno por su marcador |
 | 2026-11-09 | Nota: `card checklist item check` y `uncheck` declara `items` como posicional opcional (`nargs="?"`) para admitir `--all`; las respuestas de checklist añaden `progress`, `checked` y `total` |
 | 2026-11-09 | F4: ruff check, ruff format --check, mypy, pytest con cobertura y trazabilidad en verde (ver informe final) |
-| 2026-11-09 | F5 pendiente: solo local, PR y CI a la espera de confirmación del usuario |
 | 2026-11-09 | F5: PR #15 fusionado en `develop` con merge commit, CI en verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14. Estado: `done`. |

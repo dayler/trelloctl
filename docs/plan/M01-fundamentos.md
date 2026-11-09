@@ -79,5 +79,5 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 | Fecha | Evento |
 | ----- | ------ |
 | 2026-11-09 | F1-F3: paths, errors, output and logging implemented; 19/19 TCs automated in `tests/acceptance/test_m01_foundations.py` and verified one by one (1 iteration each); unit tests added |
-| 2026-11-09 | F4: `uv sync --all-extras`, `ruff check`, `ruff format --check`, `mypy`, `pytest` (65 passed, coverage 99.61 %), `check_traceability.py` all green (warning only: master plan still shows M01 as in_progress). F5 pending: local only, PR and CI pending user confirmation |
+| 2026-11-09 | F4: `uv sync --all-extras`, `ruff check`, `ruff format --check`, `mypy`, `pytest` (65 passed, coverage 99.61 %), `check_traceability.py` all green (warning only: master plan still shows M01 as in_progress). |
 | 2026-11-09 | F5: PR #2 fusionado en `develop` con merge commit, CI en verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14. Estado: `done`. |
