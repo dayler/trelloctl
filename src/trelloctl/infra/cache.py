@@ -263,6 +263,14 @@ class Cache:
         with self._tx() as conn:
             conn.execute("UPDATE boards SET cards_stale = 1 WHERE board_id = ?", (board_id,))
 
+    def touch_cards(self, board_id: str, now: datetime) -> None:
+        """Renew the cards freshness stamp after an incremental reload and clear the stale flag."""
+        with self._tx() as conn:
+            conn.execute(
+                "UPDATE boards SET cards_fetched_at = ?, cards_stale = 0 WHERE board_id = ?",
+                (now.timestamp(), board_id),
+            )
+
     # -- metadata ---------------------------------------------------------------------
 
     def replace_metadata(

@@ -148,3 +148,14 @@ def test_clear_attachments_ignores_missing_folder(tmp_path: Path) -> None:
     cache = Cache.open(tmp_path)
     assert cache.clear(attachments=True) == {"attachments_removed": 0}
     cache.close()
+
+
+def test_touch_cards_renews_stamp_and_clears_stale() -> None:
+    cache = Cache.memory()
+    cache.replace_cards("b", [], NOW)
+    cache.mark_cards_stale("b")
+    later = NOW + timedelta(seconds=30)
+    cache.touch_cards("b", later)
+    assert cache.cards_age_seconds("b", later) == 0
+    assert cache.cards_fresh("b", later, 10)
+    cache.close()
