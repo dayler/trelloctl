@@ -1,7 +1,7 @@
 ---
 id: M14
 title: Diagnóstico doctor y doctor --api
-status: in_review
+status: done
 wave: 7
 depends_on: [M08, M10, M11, M12, M13]
 branch: feature/m14-doctor
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M14 — Diagnóstico `doctor` y `doctor --api`
 
-**Estado:** 🔵 En revisión · **Ola:** 7 · **Depende de:** M08, M10, M11, M12, M13 · **Rama:** `feature/m14-doctor`
+**Estado:** 🟢 Completado · **Ola:** 7 · **Depende de:** M08, M10, M11, M12, M13 · **Rama:** `feature/m14-doctor`
 
 ## Objetivo
 
@@ -42,11 +42,11 @@ Cualquier corrección automática del entorno.
 
 | Fase | Descripción                                                     | Estado |
 | ---- | --------------------------------------------------------------- | ------ |
-| F1   | Implementación                                                  | 🟢      |
-| F2   | Pruebas unitarias                                               | 🟢      |
-| F3   | TCs automatizados                                               | 🟢      |
-| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | 🟢      |
-| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪ (local only: PR and CI pending user confirmation) |
+| F1   | Implementación                                                  | 🟢 |
+| F2   | Pruebas unitarias                                               | 🟢 |
+| F3   | TCs automatizados                                               | 🟢 |
+| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | 🟢 |
+| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | 🟢 |
 
 ## Casos de prueba automatizados
 
@@ -89,3 +89,4 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 | 2026-11-09 | F1-F3: `doctor.py` (checks in AC-5.2 order, `--api` contract and smoke reads, single endpoint inventory), `doctor` block in `registry.py` (`text_output`, `mcp=False`), fake route `tests/fakes/trello/openapi.py` with fixture `tests/fixtures/openapi/swagger.v3.json`, 29 unit tests and 25 acceptance TCs (TC-M14-001 to 025), each verified individually |
 | 2026-11-09 | Decisions: `--api` adds `api_spec`, `api_contract` (FAIL for missing endpoint or method), `api_parameters` (WARN for deprecated or undocumented parameters) and one `smoke GET <path>` check per read endpoint; checks that need the API are skipped as `WARN` when credentials or the token are invalid; the `/members/{id}` smoke read uses a member id taken from the default board; the file-download route is in the inventory with `spec=False`; TC-M14-012 and TC-M14-023 skip the CLI's own `ensure_home` (monkeypatch) because the CLI would otherwise fail before `doctor` runs |
 | 2026-11-09 | F4 local gates: `uv sync --all-extras` ok; `ruff check` ok; `ruff format --check` ok; `mypy` ok; `pytest --cov` 923 passed, 1 skipped, coverage 99.04 % (doctor.py 99 %); `check_traceability.py` OK. F5 (PR and CI) pending user confirmation |
+| 2026-11-09 | F5: PR #17 fusionado en `develop` con merge commit, CI en verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14. Estado: `done`. |
