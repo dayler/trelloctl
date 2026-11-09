@@ -1,0 +1,142 @@
+name: CI
+
+# Unit tests and automated test cases against the fake Trello server.
+# No job talks to real Trello. Tuned for the GitHub Actions free tier:
+# lint gates the matrix, superseded runs are cancelled, the full
+# 3 OS x 3 Python matrix runs on pull requests, main and manual runs,
+# and a push to develop (already validated by its PR) runs a single smoke job.
+#
+# Until milestone M00 adds pyproject.toml, only the `detect` job runs and
+# every other job is skipped, so the workflow stays green on a docs-only
+# repository and activates by itself once the package exists.
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detect:
+    name: Detect Python package
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      package: ${{ steps.detect.outputs.package }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - id: detect
+        name: Look for pyproject.toml
+        run: |
+          if [ -f pyproject.toml ]; then
+            echo "package=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "package=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No pyproject.toml yet; checks, tests and package jobs are skipped until M00."
+          fi
+
+  checks:
+    name: Lint, types and traceability
+    needs: detect
+    if: needs.detect.outputs.package == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --locked --all-extras
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Format
+        run: uv run ruff format --check .
+
+      - name: Types
+        run: uv run mypy
+
+      - name: Traceability (PRD acceptance criteria to test cases)
+        run: uv run python tools/check_traceability.py
+
+  tests:
+    name: Tests (${{ matrix.os }}, Python ${{ matrix.python }})
+    needs: checks
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: true
+      matrix:
+        os: ${{ fromJSON(github.event_name == 'push' && github.ref == 'refs/heads/develop' && '["ubuntu-latest"]' || '["ubuntu-latest", "windows-latest", "macos-latest"]') }}
+        python: ${{ fromJSON(github.event_name == 'push' && github.ref == 'refs/heads/develop' && '["3.12"]' || '["3.12", "3.13", "3.14"]') }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python }}
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --locked --all-extras
+
+      - name: Unit tests and automated test cases (coverage >= 90 %)
+        run: uv run pytest --cov=trelloctl --cov-branch --cov-report=term-missing --cov-fail-under=90
+
+  package:
+    name: Base install without runtime dependencies
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Build wheel
+        run: uv build --wheel
+
+      - name: Install wheel without extras in a clean environment
+        run: |
+          uv venv "$RUNNER_TEMP/base"
+          uv pip install --python "$RUNNER_TEMP/base" dist/*.whl
+
+      - name: Only trelloctl is installed (RNF-1)
+        run: |
+          extra="$(uv pip freeze --python "$RUNNER_TEMP/base" | grep -v '^trelloctl==' || true)"
+          if [ -n "$extra" ]; then
+            echo "Unexpected runtime dependencies:"
+            echo "$extra"
+            exit 1
+          fi
+
+      - name: CLI runs from the base install
+        run: '"$RUNNER_TEMP/base/bin/trelloctl" --version'
+
+      - name: mcp serve without the extra exits with USAGE (clarification A-1)
+        run: |
+          set +e
+          "$RUNNER_TEMP/base/bin/trelloctl" mcp serve < /dev/null
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "Expected exit code 2, got $code"
+            exit 1
+          fi
