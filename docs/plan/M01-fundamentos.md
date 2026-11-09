@@ -1,7 +1,7 @@
 ---
 id: M01
 title: Fundamentos — rutas, errores, salida y logs
-status: pending
+status: in_review
 wave: 1
 depends_on: [M00]
 branch: feature/m01-fundamentos
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M01 — Fundamentos: rutas, errores, salida y logs
 
-**Estado:** ⚪ Pendiente · **Ola:** 1 · **Depende de:** M00 · **Rama:** `feature/m01-fundamentos`
+**Estado:** 🔵 En revisión · **Ola:** 1 · **Depende de:** M00 · **Rama:** `feature/m01-fundamentos`
 
 ## Objetivo
 
@@ -40,11 +40,11 @@ Lectura de configuración (M03), argparse y códigos de salida en el proceso (M0
 
 | Fase | Descripción                                                     | Estado |
 | ---- | --------------------------------------------------------------- | ------ |
-| F1   | Implementación                                                  | ⚪      |
-| F2   | Pruebas unitarias                                               | ⚪      |
-| F3   | TCs automatizados                                               | ⚪      |
-| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | ⚪      |
-| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪      |
+| F1   | Implementación                                                  | 🟢      |
+| F2   | Pruebas unitarias                                               | 🟢      |
+| F3   | TCs automatizados                                               | 🟢      |
+| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | 🟢      |
+| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff` | ⚪ local only: PR and CI pending user confirmation |
 
 ## Casos de prueba automatizados
 
@@ -78,3 +78,5 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 
 | Fecha | Evento |
 | ----- | ------ |
+| 2026-11-09 | F1-F3: paths, errors, output and logging implemented; 19/19 TCs automated in `tests/acceptance/test_m01_foundations.py` and verified one by one (1 iteration each); unit tests added |
+| 2026-11-09 | F4: `uv sync --all-extras`, `ruff check`, `ruff format --check`, `mypy`, `pytest` (65 passed, coverage 99.61 %), `check_traceability.py` all green (warning only: master plan still shows M01 as in_progress). F5 pending: local only, PR and CI pending user confirmation |
