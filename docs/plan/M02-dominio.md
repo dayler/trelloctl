@@ -39,10 +39,10 @@ Resolución contra caché o Trello (M07).
 
 | Fase | Descripción                                                     | Estado |
 | ---- | --------------------------------------------------------------- | ------ |
-| F1   | Implementación                                                  | 🟡      |
-| F2   | Pruebas unitarias                                               | ⚪      |
-| F3   | TCs automatizados                                               | ⚪      |
-| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | ⚪      |
+| F1   | Implementación                                                  | 🟢     |
+| F2   | Pruebas unitarias                                               | 🟢     |
+| F3   | TCs automatizados                                               | 🟢     |
+| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | 🟢     |
 | F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪ local only: PR and CI pending user confirmation |
 
 ## Casos de prueba automatizados
