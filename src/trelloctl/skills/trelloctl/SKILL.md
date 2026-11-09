@@ -35,7 +35,7 @@ trelloctl --board 5f1b2c3d4e5f6a7b8c9d0e1f board show
 ```
 
 ```json
-{"ok": true, "data": {"id": "5f1b2c3d4e5f6a7b8c9d0e1f", "name": "Work", "url": "https://trello.com/b/AbCdEf/work", "closed": false}, "meta": {"schema_version": "1", "command": "board show", "board_id": "5f1b2c3d4e5f6a7b8c9d0e1f", "elapsed_ms": 412, "cache": {"hit": false, "age_seconds": 0, "stale": false}}}
+{"ok": true, "data": {"id": "5f1b2c3d4e5f6a7b8c9d0e1f", "short_link": "AbCdEf", "name": "Work", "url": "https://trello.com/b/AbCdEf/work", "is_default": true, "lists": 3, "cards": 2, "labels": 2}, "meta": {"schema_version": "1", "command": "board show", "board_id": "5f1b2c3d4e5f6a7b8c9d0e1f", "elapsed_ms": 412, "cache": {"hit": false, "age_seconds": 0, "stale": false}}}
 ```
 
 ## Board
@@ -56,7 +56,7 @@ trelloctl board lists
 ```
 
 ```json
-{"ok": true, "data": {"lists": [{"id": "6a00000000000000000000a1", "name": "To Do", "index": 0, "closed": false}, {"id": "6a00000000000000000000a2", "name": "Doing", "index": 1, "closed": false}]}, "meta": {"schema_version": "1", "command": "board lists", "board_id": "5f1b2c3d4e5f6a7b8c9d0e1f", "elapsed_ms": 38, "cache": {"hit": true, "age_seconds": 42, "stale": false}}}
+{"ok": true, "data": {"lists": [{"index": 0, "id": "6a00000000000000000000a1", "name": "To Do", "closed": false, "cards": 1}, {"index": 1, "id": "6a00000000000000000000a2", "name": "Doing", "closed": false, "cards": 1}, {"index": 2, "id": "6a00000000000000000000a3", "name": "Done", "closed": false, "cards": 0}]}, "meta": {"schema_version": "1", "command": "board lists", "board_id": "5f1b2c3d4e5f6a7b8c9d0e1f", "elapsed_ms": 38, "cache": {"hit": true, "age_seconds": 42, "stale": false}}}
 ```
 
 ```bash
@@ -64,32 +64,35 @@ trelloctl board list move "Doing" --right 1 --dry-run
 ```
 
 ```json
-{"ok": true, "data": {"dry_run": true, "from_index": 1, "to_index": 2, "list_count": 4}, "meta": {"schema_version": "1", "command": "board list move", "elapsed_ms": 12}}
+{"ok": true, "data": {"list": {"id": "6a00000000000000000000a2", "name": "Doing"}, "from_index": 1, "to_index": 2, "list_count": 3, "target_list": {"id": "6a00000000000000000000a3", "name": "Done"}, "clamped": false, "dry_run": true, "moved": false}, "meta": {"schema_version": "1", "command": "board list move", "board_id": "5f1b2c3d4e5f6a7b8c9d0e1f", "elapsed_ms": 12}}
 ```
 
 ## Cards
 
 Commands:
 
-- `card create`, `card get [--full]`, `card list [--include-archived]`, `card search <pattern> [--in ...]`
+- `card create`, `card get [--full | --with ...]`, `card list [--include-archived]`, `card search <pattern> [--in ...]`
 - `card comments`, `card update`, `card copy`, `card done`, `card undone`
 - `card move [--to <list> | --left N | --right N] [--clamp] [--dry-run]`
 - `card archive`, `card unarchive`
 
 `card move --left N` and `--right N` move the card to the list N positions to the left or
 to the right of its current list. A target outside the board fails with `MOVE_OUT_OF_RANGE`
-unless `--clamp` stops it at the first or last list. `card get --full` adds comments,
-checklists, attachments and members.
+unless `--clamp` stops it at the first or last list. `card get` always includes labels and
+members; `--full` adds checklists, attachments and comments (`--with` picks some of them).
 
-Search patterns use `*` as a wildcard and match case-insensitively. `--in` chooses where to
-look: any of `name`, `desc`, `comments`. Without `--in` it searches names.
+Search patterns use `*` and `?` as wildcards and match case-insensitively; a pattern without
+wildcards matches anywhere in the text. `--in` chooses where to look: any of `name`, `desc`,
+`checklists`, `comments`; the default is `name,desc`. Each result carries `matched`, the fields
+where the pattern was found, and `comment_ids` when a comment matched. Comment searches go to
+Trello and ignore wildcards; `meta.warnings` says so.
 
 ```bash
 trelloctl card create --list "To Do" --name "Review PR 42" --labels bug,urgent
 ```
 
 ```json
-{"ok": true, "data": {"id": "6b00000000000000000000c1", "name": "Review PR 42", "list": {"id": "6a00000000000000000000a1", "name": "To Do"}, "labels": ["bug", "urgent"], "url": "https://trello.com/c/Xy12Ab/42-review-pr-42"}, "meta": {"schema_version": "1", "command": "card create", "board_id": "5f1b2c3d4e5f6a7b8c9d0e1f", "elapsed_ms": 530}}
+{"ok": true, "data": {"id": "6b00000000000000000000c3", "idShort": 79, "shortLink": "Xy12Ab", "name": "Review PR 42", "desc": "", "url": "https://trello.com/c/Xy12Ab/79-review-pr-42", "list": {"id": "6a00000000000000000000a1", "name": "To Do"}, "labels": [{"id": "a00000000000000000000004", "name": "bug", "color": "red"}, {"id": "a00000000000000000000005", "name": "urgent", "color": "yellow"}], "members": [], "due": null, "dueComplete": false, "pos": 16384.0, "archived": false, "dateLastActivity": "2026-11-09T18:24:16.341Z", "badges": {"comments": 0, "attachments": 0, "checkItems": 0, "checkItemsChecked": 0}}, "meta": {"schema_version": "1", "command": "card create", "board_id": "5f1b2c3d4e5f6a7b8c9d0e1f", "elapsed_ms": 530}}
 ```
 
 ```bash
@@ -97,7 +100,7 @@ trelloctl card search "core-78*" --in name,desc,comments --limit 5
 ```
 
 ```json
-{"ok": true, "data": {"cards": [{"id": "6b00000000000000000000c2", "name": "CORE-78 fix login", "list": "Doing", "matched_in": ["name"]}]}, "meta": {"schema_version": "1", "command": "card search", "board_id": "5f1b2c3d4e5f6a7b8c9d0e1f", "elapsed_ms": 61, "cache": {"hit": true, "age_seconds": 12, "stale": false}, "truncated": false}}
+{"ok": true, "data": {"cards": [{"id": "6b00000000000000000000c2", "idShort": 78, "shortLink": "Xy12Ab", "name": "CORE-78 fix login", "desc": "Login fails", "url": "https://trello.com/c/Xy12Ab/78-core-78-fix-login", "list": {"id": "6a00000000000000000000a2", "name": "Doing"}, "labels": [], "members": [], "due": null, "dueComplete": false, "pos": 16384.0, "archived": false, "dateLastActivity": "2026-11-09T18:24:16.341Z", "badges": {"comments": 0, "attachments": 0, "checkItems": 0, "checkItemsChecked": 0}, "matched": ["name"]}]}, "meta": {"schema_version": "1", "command": "card search", "board_id": "5f1b2c3d4e5f6a7b8c9d0e1f", "elapsed_ms": 61, "cache": {"hit": true, "age_seconds": 12, "stale": false}, "truncated": false, "warnings": ["Trello does not support wildcards or brackets in comment searches; they were removed and 'core-78' was searched in comments."]}}
 ```
 
 ```bash
@@ -105,7 +108,7 @@ trelloctl card move 6b00000000000000000000c2 --right 1 --dry-run
 ```
 
 ```json
-{"ok": true, "data": {"dry_run": true, "from_list": "Doing", "to_list": "Done", "from_index": 1, "to_index": 2}, "meta": {"schema_version": "1", "command": "card move", "elapsed_ms": 9}}
+{"ok": true, "data": {"dry_run": true, "from": {"id": "6a00000000000000000000a2", "name": "Doing", "index": 1}, "to": {"id": "6a00000000000000000000a3", "name": "Done", "index": 2}, "card": {"id": "6b00000000000000000000c2", "idShort": 78, "shortLink": "Xy12Ab", "name": "CORE-78 fix login", "desc": "Login fails", "url": "https://trello.com/c/Xy12Ab/78-core-78-fix-login", "list": {"id": "6a00000000000000000000a2", "name": "Doing"}, "labels": [], "members": [], "due": null, "dueComplete": false, "pos": 16384.0, "archived": false, "dateLastActivity": "2026-11-09T18:24:16.341Z", "badges": {"comments": 0, "attachments": 0, "checkItems": 0, "checkItemsChecked": 0}}}, "meta": {"schema_version": "1", "command": "card move", "board_id": "5f1b2c3d4e5f6a7b8c9d0e1f", "elapsed_ms": 9}}
 ```
 
 ## Card details
@@ -124,11 +127,11 @@ Use `card label set` or `card member set` to replace the whole set in one call, 
 not done; give the card, the checklist and the item by id when names may repeat.
 
 ```bash
-trelloctl card comment add 6b00000000000000000000c1 "Looks good @ana, merging today"
+trelloctl card comment add 6b00000000000000000000c1 --text "Looks good @ana, merging today"
 ```
 
 ```json
-{"ok": true, "data": {"id": "6c00000000000000000000d1", "text": "Looks good @ana, merging today", "card_id": "6b00000000000000000000c1"}, "meta": {"schema_version": "1", "command": "card comment add", "elapsed_ms": 301}}
+{"ok": true, "data": {"id": "6c00000000000000000000d2", "text": "Looks good @ana, merging today", "date": "2026-11-09T18:24:42.256Z", "memberId": "5f1b2c3d4e5f6a7b8c9d0e77", "member": "tester"}, "meta": {"schema_version": "1", "command": "card comment add", "board_id": "5f1b2c3d4e5f6a7b8c9d0e1f", "elapsed_ms": 301}}
 ```
 
 ```bash
@@ -136,7 +139,7 @@ trelloctl card checklist item check "Review PR 42" QA "e2e tests"
 ```
 
 ```json
-{"ok": true, "data": {"checklist": "QA", "item": {"id": "6d00000000000000000000e1", "name": "e2e tests", "state": "complete"}}, "meta": {"schema_version": "1", "command": "card checklist item check", "elapsed_ms": 280}}
+{"ok": true, "data": {"id": "6d00000000000000000000b1", "name": "QA", "pos": 1.0, "progress": "1/2", "checked": 1, "total": 2, "items": [{"id": "6d00000000000000000000e1", "name": "e2e tests", "state": "complete", "pos": 1.0}, {"id": "6d00000000000000000000e2", "name": "unit tests", "state": "incomplete", "pos": 2.0}], "changed": ["6d00000000000000000000e1"]}, "meta": {"schema_version": "1", "command": "card checklist item check", "board_id": "5f1b2c3d4e5f6a7b8c9d0e1f", "elapsed_ms": 280}}
 ```
 
 ## Attachments
@@ -159,7 +162,7 @@ trelloctl card attachments list 6b00000000000000000000c1
 ```
 
 ```json
-{"ok": true, "data": {"attachments": [{"id": "6e00000000000000000000f1", "name": "report.pdf", "bytes": 48213, "isUpload": true}, {"id": "6e00000000000000000000f2", "name": "spec", "url": "https://example.com/spec", "isUpload": false}]}, "meta": {"schema_version": "1", "command": "card attachments list", "elapsed_ms": 95, "cache": {"hit": false, "age_seconds": 0, "stale": false}}}
+{"ok": true, "data": {"card": {"id": "6b00000000000000000000c1", "name": "Review PR 42", "idShort": 42}, "attachments": [{"id": "6e00000000000000000000f1", "name": "report.pdf", "bytes": 48213, "mimeType": "application/pdf", "date": "2026-11-02T09:00:00.000Z", "url": "https://trello.com/1/cards/6b00000000000000000000c1/attachments/6e00000000000000000000f1/download/report.pdf", "isUpload": true, "local_path": null}, {"id": "6e00000000000000000000f2", "name": "spec", "bytes": 0, "mimeType": null, "date": "2026-11-02T09:05:00.000Z", "url": "https://example.com/spec", "isUpload": false, "local_path": null}]}, "meta": {"schema_version": "1", "command": "card attachments list", "board_id": "5f1b2c3d4e5f6a7b8c9d0e1f", "elapsed_ms": 95, "cache": {"hit": false, "age_seconds": 0, "stale": false}}}
 ```
 
 ## Inbox
@@ -184,7 +187,7 @@ trelloctl inbox add --name "Review November invoice" --due 2026-11-15
 ```
 
 ```json
-{"ok": true, "data": {"id": "6f00000000000000000000a9", "name": "Review November invoice", "due": "2026-11-15T12:00:00.000Z"}, "meta": {"schema_version": "1", "command": "inbox add", "elapsed_ms": 340}}
+{"ok": true, "data": {"id": "6f00000000000000000000a9", "idShort": 2, "shortLink": "Xy12Ab", "name": "Review November invoice", "desc": "", "url": "https://trello.com/c/Xy12Ab/2-review-november-invoice", "list": {"id": "7a1b2c3d4e5f6a7b8c9d0e3c", "name": "Inbox"}, "labels": [], "members": [], "due": "2026-11-15T12:00:00.000Z", "dueComplete": false, "pos": 16384.0, "archived": false, "dateLastActivity": "2026-11-09T18:24:16.341Z", "badges": {"comments": 0, "attachments": 0, "checkItems": 0, "checkItemsChecked": 0}}, "meta": {"schema_version": "1", "command": "inbox add", "board_id": "7a1b2c3d4e5f6a7b8c9d0e3b", "elapsed_ms": 340}}
 ```
 
 ## Cache
@@ -208,7 +211,7 @@ trelloctl cache status
 ```
 
 ```json
-{"ok": true, "data": {"path": "/home/user/.trelloctl/cache.db", "boards": [{"board_id": "5f1b2c3d4e5f6a7b8c9d0e1f", "cards": 120, "age_seconds": 42}]}, "meta": {"schema_version": "1", "command": "cache status", "elapsed_ms": 7}}
+{"ok": true, "data": {"boards": [], "member_boards": {"count": 0, "age_seconds": null}, "attachments_bytes": 0, "database_bytes": 123416}, "meta": {"schema_version": "1", "command": "cache status", "elapsed_ms": 7}}
 ```
 
 ## MCP
@@ -260,8 +263,12 @@ Save tokens: `--limit N` and `--fields a,b,c` work on `card list`, `card search`
 cut the list. `--compact` prints the envelope on one line instead of indented. Never retry a
 `RATE_LIMITED` error immediately: wait `error.details.retry_in_seconds`.
 
+```bash
+trelloctl card move 6b00000000000000000000c1 --right 9
+```
+
 ```json
-{"ok": false, "error": {"code": "MOVE_OUT_OF_RANGE", "message": "Target list (index 7) is outside the board (5 lists).", "details": {"from_index": 4, "to_index": 7, "list_count": 5}}, "meta": {"schema_version": "1", "command": "card move", "elapsed_ms": 230}}
+{"ok": false, "error": {"code": "MOVE_OUT_OF_RANGE", "message": "The target position is outside the open lists.", "details": {"from_index": 0, "to_index": 9, "list_count": 3}}, "meta": {"schema_version": "1", "command": "card move", "elapsed_ms": 230}}
 ```
 
 ## Rules

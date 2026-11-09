@@ -17,12 +17,12 @@ Documentos relacionados: [[01-estrategia-de-pruebas]] · [[tc-manuales-trello]] 
 
 | Indicador                       | Valor               |
 | ------------------------------- | ------------------- |
-| Estado global                   | 🟡                  |
-| Ola en curso                    | 7 (M14 en curso; M16 pendiente) |
-| Milestones completados          | 15 / 17 |
-| TCs automatizados implementados | 412 / 451 |
+| Estado global                   | 🟢                  |
+| Ola en curso                    | — (las 9 olas completadas) |
+| Milestones completados          | 17 / 17 |
+| TCs automatizados implementados | 451 / 451 |
 | TCs manuales ejecutados         | 0 / 11              |
-| Último milestone fusionado      | M15 (PR #16) |
+| Último milestone fusionado      | M16 (PR #18) |
 
 ### Leyenda de semáforos
 
@@ -56,9 +56,9 @@ Fases de cada milestone: **F1** implementación · **F2** pruebas unitarias · *
 | [[M11-adjuntos\|M11 Adjuntos]]                             | 5 | M07                     | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 21 (10/8/3) | [#12](https://github.com/dayler/trelloctl/pull/12) |
 | [[M10-detalle-tarjeta\|M10 Detalle de tarjeta]]            | 6 | M09                     | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 39 (24/13/2) | [#15](https://github.com/dayler/trelloctl/pull/15) |
 | [[M12-inbox\|M12 Inbox]]                                   | 6 | M09                     | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 19 (11/7/1) | [#14](https://github.com/dayler/trelloctl/pull/14) |
-| [[M14-doctor\|M14 Doctor]]                                 | 7 | M08, M10, M11, M12, M13 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 25 (13/10/2) | — |
+| [[M14-doctor\|M14 Doctor]]                                 | 7 | M08, M10, M11, M12, M13 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 25 (13/10/2) | [#17](https://github.com/dayler/trelloctl/pull/17) |
 | [[M15-mcp\|M15 Servidor MCP]]                              | 7 | M08, M10, M11, M12, M13 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 19 (12/6/1) | [#16](https://github.com/dayler/trelloctl/pull/16) |
-| [[M16-cierre\|M16 Cierre]]                                 | 8 | M14, M15                | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 14 (14/0/0) | — |
+| [[M16-cierre\|M16 Cierre]]                                 | 8 | M14, M15                | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 14 (14/0/0) | [#18](https://github.com/dayler/trelloctl/pull/18) |
 | **Total**                                                  |   |                         |    |    |    |    |    |    | **451 (255/136/60)** | |
 
 ## Olas de ejecución
@@ -74,8 +74,8 @@ Una ola agrupa milestones sin dependencias entre sí; sus subagentes trabajan en
 | 4   | M07, M13           | 2                      | 🟢      |
 | 5   | M08, M09, M11      | 3                      | 🟢      |
 | 6   | M10, M12           | 2                      | 🟢      |
-| 7   | M14, M15           | 2                      | 🟡      |
-| 8   | M16                | 1                      | ⚪      |
+| 7   | M14, M15           | 2                      | 🟢      |
+| 8   | M16                | 1                      | 🟢      |
 
 ## Grafo de dependencias
 
@@ -120,8 +120,7 @@ flowchart LR
     classDef in_progress fill:#fde68a,stroke:#b45309,color:#111827
     classDef in_review fill:#bfdbfe,stroke:#1d4ed8,color:#111827
     classDef done fill:#bbf7d0,stroke:#15803d,color:#111827
-    class M14,M16 pending
-    class M00,M01,M02,M03,M04,M05,M06,M07,M08,M09,M10,M11,M12,M13,M15 done
+    class M00,M01,M02,M03,M04,M05,M06,M07,M08,M09,M10,M11,M12,M13,M14,M15,M16 done
 ```
 
 ## Cobertura del PRD por milestone
@@ -281,3 +280,4 @@ El workflow `.github/workflows/ci.yml` corre en cada PR contra `develop` o `main
 | 2026-11-09 | Ola 3 (M05, M06) verificada y fusionada en `develop` en local (sin PR ni CI): 50 TCs; suite integrada 290 pruebas (1 omitida: TC-M06-013, solo POSIX), cobertura 98,9 %; ola 4 (M07, M13) en curso |
 | 2026-11-09 | M00 a M13 fusionados en `develop` mediante PR #1 a #15 (el #10 es el refactor `touch_cards` de la caché), cada uno con CI en verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14; F5 y estado pasan a 🟢 `done`. Errores de CI encontrados y corregidos: comprobación de la instalación base (M00), recursión del aviso de rotación de logs (M01) y comparación de saltos de línea en la prueba del skill (M13) |
 | 2026-11-09 | M15 fusionado en `develop` mediante el PR #16, con CI en verde en los tres sistemas y las tres versiones de Python |
+| 2026-11-09 | M14 fusionado en `develop` mediante el PR #17 y M16 mediante el PR #18; los 17 milestones quedan en 🟢. Se añade `docs/plan/99-walkthrough.md`. Pendientes del responsable: TCs manuales de [[tc-manuales-trello]] y fusión de `develop` en `main` |

@@ -82,6 +82,35 @@ class _UsageError(TrelloctlError):
         self.command = command
 
 
+_CREDENTIAL_WORDS = frozenset(
+    {"token", "key", "apikey", "password", "passwd", "secret", "credential", "credentials"}
+)
+
+
+def _credential_values(args: Sequence[str]) -> list[str]:
+    """Values given to credential-looking options, which must never be echoed."""
+    found: list[str] = []
+    for index, arg in enumerate(args):
+        if not arg.startswith("--"):
+            continue
+        name, equals, value = arg[2:].partition("=")
+        if not set(name.lower().split("-")) & _CREDENTIAL_WORDS:
+            continue
+        if equals:
+            found.append(value)
+        elif index + 1 < len(args) and not args[index + 1].startswith("-"):
+            found.append(args[index + 1])
+    return [v for v in found if v]
+
+
+def _redacted(exc: _UsageError, args: Sequence[str]) -> _UsageError:
+    """The usage error with every credential value replaced by `***`."""
+    message = exc.message
+    for secret in sorted(_credential_values(args), key=len, reverse=True):
+        message = message.replace(secret, "***")
+    return exc if message == exc.message else _UsageError(message, exc.command)
+
+
 def _command_of(prog: str) -> str:
     return " ".join(prog.split()[1:])
 
@@ -405,7 +434,8 @@ def main(
         namespace = _parse(parser, args)
     except SystemExit as exc:  # --help, --version
         return exc.code if isinstance(exc.code, int) else EXIT_OK
-    except _UsageError as exc:
-        _log_usage_error(env, exc.command, started)
-        return _fail(exc, exc.command, "--compact" in args)
+    except _UsageError as raised:
+        usage = _redacted(raised, args)
+        _log_usage_error(env, usage.command, started)
+        return _fail(usage, usage.command, "--compact" in args)
     return _run(namespace, env, transport, started)

@@ -206,3 +206,22 @@ def test_environment_and_transport_are_injectable(capsys: pytest.CaptureFixture[
     assert code == 0
     assert json.loads(capsys.readouterr().out)["data"] == {"id": "m1"}
     assert "key=k" in transport.requests[0].url
+
+
+@pytest.mark.parametrize(
+    "argv",
+    [
+        ["--token", "s3cret", "board", "show"],
+        ["board", "show", "--api-key", "s3cret"],
+        ["board", "show", "--password=s3cret"],
+        ["board", "show", "--secret", "s3cret"],
+    ],
+)
+def test_credential_values_are_never_echoed_in_usage_errors(
+    argv: list[str], capsys: pytest.CaptureFixture[str]
+) -> None:
+    assert main(argv) == 2
+    captured = capsys.readouterr()
+    assert "s3cret" not in captured.out + captured.err
+    assert json.loads(captured.out)["error"]["code"] == "USAGE"
+    assert "***" in captured.out

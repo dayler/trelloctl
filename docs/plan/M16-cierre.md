@@ -1,7 +1,7 @@
 ---
 id: M16
 title: Cierre — requisitos no funcionales, completitud y release candidata
-status: pending
+status: done
 wave: 8
 depends_on: [M14, M15]
 branch: feature/m16-cierre
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M16 — Cierre: requisitos no funcionales, completitud y release candidata
 
-**Estado:** ⚪ Pendiente · **Ola:** 8 · **Depende de:** M14, M15 (y por transitividad todos) · **Rama:** `feature/m16-cierre`
+**Estado:** 🟢 Completado · **Ola:** 8 · **Depende de:** M14, M15 (y por transitividad todos) · **Rama:** `feature/m16-cierre`
 
 ## Objetivo
 
@@ -41,11 +41,11 @@ Publicación en PyPI y merge a `main` (decisión del responsable tras este miles
 
 | Fase | Descripción                                                     | Estado |
 | ---- | --------------------------------------------------------------- | ------ |
-| F1   | Implementación (README y ajustes de cierre)                     | ⚪      |
-| F2   | Pruebas unitarias                                               | ⚪      |
-| F3   | TCs automatizados                                               | ⚪      |
-| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad estricta | ⚪ |
-| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪      |
+| F1   | Implementación (README y ajustes de cierre)                     | 🟢 |
+| F2   | Pruebas unitarias                                               | 🟢 |
+| F3   | TCs automatizados                                               | 🟢 |
+| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad estricta | 🟢 |
+| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | 🟢 |
 
 ## Casos de prueba automatizados
 
@@ -74,3 +74,10 @@ La común del [[00-plan-maestro#Definición de terminado común]], más: comprob
 
 | Fecha | Evento |
 | ----- | ------ |
+| 2026-11-09 | F1 hecha: README reescrito en español (instalación, configuración, credenciales, tablero, ejemplos, MCP experimental, licencia) y ejemplos del SKILL.md alineados con la salida real (`matched`/`comment_ids`, `card move` con `from`/`to`/`card`, envolturas `lists`/`labels`/`members`/`actions`, `card comment add --text`, `card get --full`) |
+| 2026-11-09 | F2 y F3 hechas: 14 TCs automatizados (`test_m16_static.py`, `test_m16_wheel.py`, `test_m16_codes.py`, `test_m16_behaviour.py`, apoyo en `m16_support.py`, prueba unitaria del extractor de ejemplos); cada TC verificado por separado y en verde |
+| 2026-11-09 | Desviación TC-M16-006: `card archive`, `card done` y `board list archive` repetidos devuelven `ok: true` y no cambian el estado, pero reenvían el mismo PUT (el código de M08/M09 no lo omite); solo etiqueta, miembro e ítem presentes se omiten sin escritura. La prueba exige exactamente eso; omitir también el PUT exigiría tocar `card.py` y `lists.py`, fuera del alcance de M16 |
+| 2026-11-09 | Hallazgo (sin tocar `cli.py`): el mensaje `USAGE` de argparse repite los argumentos no reconocidos, por ejemplo el valor tras `--token`; y la ayuda general dice que MCP es experimental pero no nombra `trelloctl[mcp]` (sí lo hacen `mcp serve --help`, el SKILL y el README) |
+| 2026-11-09 | F4: `uv sync --all-extras` OK; `ruff check .` OK; `ruff format --check .` OK (156 archivos); `mypy` OK (35 archivos); `pytest` con cobertura: 1120 passed, 1 skipped (permisos POSIX), cobertura 98,62 % (umbral 90 %); `tools/check_traceability.py`: OK |
+| 2026-11-09 | Corrección posterior en rama `feature/fix-idempotency-redaction`: `card archive/unarchive/done/undone` y `board list archive/unarchive` ya no envían escritura si el estado coincide (RNF-6); TC-M16-006 exige cero escrituras en todas las operaciones repetidas. `cli.py` sustituye por `***` el valor de las opciones con aspecto de credencial en el mensaje `USAGE`; TC-M16-011 comprueba que no aparece en stdout, stderr ni log. Ningún TC de M08/M09 esperaba el PUT repetido |
+| 2026-11-09 | F5: PR #18 fusionado en `develop` con merge commit (este PR), CI en verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14. Estado: `done`. |

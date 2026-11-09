@@ -113,6 +113,8 @@ def _set_closed(ctx: CommandContext, args: Mapping[str, Any], closed: bool) -> d
     with Resolver(ctx) as resolver:
         board_id = resolver.selected_board()
         found = _find_list(resolver, board_id, str(args["list"]), closed=closed)
+        if bool(found["closed"]) == closed:
+            return ctx.success({"list": _summary(found)}, board_id=board_id)
         updated = resolver.guarded_write(
             "list",
             board_id,
