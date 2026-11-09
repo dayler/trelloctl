@@ -1,0 +1,110 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "trelloctl"
+dynamic = ["version"]
+description = "CLI that lets agent harnesses operate Trello boards with structured JSON output, plus an optional MCP server."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Ariel Salazar Hinojosa" }]
+requires-python = ">=3.12"
+keywords = ["trello", "cli", "json", "mcp", "agents"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
+]
+# The base install has no runtime dependencies (RNF-1).
+dependencies = []
+
+[project.optional-dependencies]
+# Optional MCP server. M15 pins the version range of the official SDK.
+mcp = ["mcp"]
+
+[project.scripts]
+trelloctl = "trelloctl.cli:main"
+
+[dependency-groups]
+dev = [
+    "hatchling>=1.27",
+    "mypy>=1.13",
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "ruff>=0.8",
+]
+
+[tool.hatch.version]
+path = "src/trelloctl/__init__.py"
+
+# Everything under the package directory ships in the wheel, including the
+# data files in `skills/` (SKILL.md, added by M13).
+[tool.hatch.build.targets.wheel]
+packages = ["src/trelloctl"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/trelloctl", "README.md", "LICENSE", "pyproject.toml"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests", "tools"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
+    "B",   # bugbear
+    "SIM", # simplify
+    "C4",  # comprehensions
+    "PT",  # pytest style
+    "RUF", # ruff-specific
+    "S",   # bandit
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["RUF001", "S101", "S105", "S106", "S108", "S310"]
+"tools/**" = ["S101", "RUF001"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src", "tools"]
+mypy_path = ["src"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+pythonpath = [".", "tools"]
+addopts = ["-ra", "--strict-markers", "--strict-config", "--import-mode=importlib"]
+markers = [
+    "tc(id): automated test case of the implementation plan, for example TC-M00-001",
+]
+
+[tool.coverage.run]
+source = ["trelloctl"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]

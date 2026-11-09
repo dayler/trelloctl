@@ -34,7 +34,7 @@ Transportes distintos de stdio (PRD §9).
 ## Archivos
 
 - **Crea:** `src/trelloctl/mcp_server.py`, `tests/unit/test_mcp_server*`, `tests/acceptance/test_m15_*`, cliente MCP de pruebas por stdio en `tests/fakes/mcp_client.py`.
-- **Modifica:** `pyproject.toml` (rango del extra), `uv.lock`, `registry.py` (entrada `mcp serve`, con la marca de stdout propio de M06), `README.md` (sección MCP), `SKILL.md` (sección MCP si falta algo).
+- **Modifica:** `pyproject.toml` (rango del extra), `uv.lock`, `registry.py` (entrada `mcp serve`, con la marca de stdout propio de M06), `README.md` (sección MCP, en español: el README es la única excepción al inglés fuera de `docs/`), `SKILL.md` (sección MCP si falta algo).
 - **No toca:** `cli.py`, `doctor.py` (M14, misma ola), `app/`, `infra/`, `domain/`.
 
 ## Fases

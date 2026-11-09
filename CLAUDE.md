@@ -14,7 +14,7 @@ IDs in the PRD use a non-breaking hyphen (U+2011): `AC‑1.2`, `RF‑7`. Search 
 
 ## Hard rules
 
-- **Language.** Everything the tool emits or installs is in English: help, `doctor` output, error messages, logs, the `config.toml` template, `SKILL.md`, README. Code, identifiers, comments, commit messages and PR text are in English too. Only `docs/` is in Spanish.
+- **Language.** Everything the tool emits or installs is in English: help, `doctor` output, error messages, logs, the `config.toml` template, `SKILL.md`. Code, identifiers, comments, commit messages and PR text are in English too. Only `docs/` and `README.md` are in Spanish (command names, options and error codes stay as they are); the README is excluded from the RNF-10 language check.
 - **No attribution.** Never credit Claude, Anthropic or any AI tool or model in commits, PRs, issues, code comments, docs or generated files. No `Co-Authored-By` trailers of that kind.
 - **Runtime is stdlib only** (Python ≥ 3.12): `argparse`, `urllib` + `ssl`, `tomllib`, `sqlite3`, `logging`, `json`, `pathlib`. The only optional runtime dependency is the official `mcp` SDK behind the `trelloctl[mcp]` extra, imported lazily inside `mcp_server.py`.
 - **No shell.** Never use `subprocess`, `os.system`, `os.popen` or `shell=True` in `src/`.

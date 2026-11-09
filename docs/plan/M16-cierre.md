@@ -14,7 +14,7 @@ tags: [plan, milestone, trelloctl]
 
 ## Objetivo
 
-Verificar sobre el producto completo los requisitos no funcionales y las métricas del PRD, cerrar la trazabilidad, completar el README en inglés y dejar `develop` listo para una release.
+Verificar sobre el producto completo los requisitos no funcionales y las métricas del PRD, cerrar la trazabilidad, completar el README (en español, única excepción fuera de `docs/`) y dejar `develop` listo para una release.
 
 ## Lectura obligatoria
 
@@ -23,7 +23,7 @@ PRD §5, §8 (RNF-1 a RNF-10), RF-27, §10.5 (lista de comandos), [[01-estrategi
 ## Alcance
 
 - Pruebas de RNF transversales y de completitud de la CLI frente a §10.5.
-- README en inglés: instalación (`pipx`, `uv tool install`), configuración mínima, credenciales, selección de tablero, ejemplos, MCP experimental, licencia.
+- README en español (única excepción al idioma inglés fuera de `docs/`; el nombre de comandos, opciones y códigos de error se mantienen tal cual): instalación (`pipx`, `uv tool install`), configuración mínima, credenciales, selección de tablero, ejemplos, MCP experimental, licencia.
 - Revisión de licencias de las dependencias de desarrollo y del extra.
 - Los TCs manuales de [[tc-manuales-trello]] no son del subagente: los ejecuta el responsable después del merge de M16 y antes de fusionar `develop` en `main` (paso 8 del protocolo del orquestador).
 
@@ -60,7 +60,7 @@ Publicación en PyPI y merge a `main` (decisión del responsable tras este miles
 | TC-M16-007 | RNF-7 | P | E | Un comando representativo por grupo con fechas en la respuesta | ISO-8601 en UTC |
 | TC-M16-008 | RNF-8 | P | C | Registro de conexiones de los TCs de M16 y análisis estático de literales de URL en `src/` | Solo `base_url` y la URL de la especificación OpenAPI |
 | TC-M16-009 | RNF-9 | P | C | Licencia del proyecto y de las dependencias de desarrollo y del extra instaladas | MIT en el proyecto; dependencias con licencias de la lista permitida (MIT, BSD, Apache-2.0, PSF, ISC, MPL-2.0) |
-| TC-M16-010 | RNF-10 | P | E | Ayuda de todos los comandos, mensajes de todo el catálogo, plantilla de `config.toml`, texto de `doctor`, `SKILL.md`, README y logs | En inglés según la heurística común |
+| TC-M16-010 | RNF-10 | P | E | Ayuda de todos los comandos, mensajes de todo el catálogo, plantilla de `config.toml`, texto de `doctor`, `SKILL.md` y logs; el README queda excluido (en español por decisión del responsable) | En inglés según la heurística común |
 | TC-M16-011 | RNF-3 | P | E | Recorrer las opciones de todos los comandos del registro | Ninguna opción acepta credenciales |
 | TC-M16-012 | §5 | P | E | Completitud: comandos del registro frente a la lista de §10.5 | Coinciden uno a uno (métrica de §5: 100 % de operaciones con un comando) |
 | TC-M16-013 | AC-26.4 | P | C | Cada invocación de ejemplo del `SKILL.md` y del README | Ejecutada contra el Trello falso con datos semilla equivalentes, termina con el mismo `ok` y el mismo código de error que muestra el ejemplo |
