@@ -1,7 +1,7 @@
 ---
 id: M08
 title: Tablero — lecturas, listas, etiquetas y actividad
-status: in_review
+status: done
 wave: 5
 depends_on: [M02, M07]
 branch: feature/m08-tablero
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M08 — Tablero: lecturas, listas, etiquetas y actividad
 
-**Estado:** 🔵 En revisión · **Ola:** 5 · **Depende de:** M02, M07 · **Rama:** `feature/m08-tablero`
+**Estado:** 🟢 Completado · **Ola:** 5 · **Depende de:** M02, M07 · **Rama:** `feature/m08-tablero`
 
 ## Objetivo
 
@@ -46,7 +46,7 @@ Comandos `card` (M09).
 | F2   | Pruebas unitarias                                               | 🟢      |
 | F3   | TCs automatizados                                               | 🟢      |
 | F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | 🟢      |
-| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪      |
+| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | 🟢 |
 
 F5: solo local, PR y CI pendientes de confirmación del usuario.
 
@@ -108,3 +108,4 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 | 2026-11-09 | F3: 41 de 41 TCs automatizados (`test_m08_reads.py`, `test_m08_lists.py`, `test_m08_labels.py`, `test_m08_activity.py`, con `m08_support.py`), cada uno verificado por separado con una sola iteración. Unitarias en `tests/unit/app/commands/test_board_unit.py`, `test_lists_unit.py`, `test_labels_unit.py`, `test_activity_unit.py`. |
 | 2026-11-09 | Desviación: `tests/fakes/trello/core.py` (no declarado en Modifica). Las rutas nuevas `PUT /lists/{id}`, `PUT /labels/{id}`, `GET /lists/{id}` y `GET /labels/{id}` tapaban las rutas que `test_m07_resolution.py` registra en el Trello falso para simular referencias rancias (10 pruebas de M07 fallaban). Cambio mínimo: las rutas añadidas por una prueba después de cargar los módulos van primero (`Router.override`), de modo que una prueba puede sustituir una ruta de un módulo; el orden entre módulos no cambia. M09 y M11 pueden necesitar lo mismo. |
 | 2026-11-09 | F4: `uv sync --all-extras` OK; `ruff check` OK; `ruff format --check` OK; `mypy` OK (28 archivos); `pytest` 515 pasadas, 1 omitida, cobertura 98,76 % (activity.py 100 %, board.py 100 %, labels.py 100 %, lists.py 99 %); `check_traceability.py` OK. |
+| 2026-11-09 | F5: PR #11 fusionado en `develop` con merge commit, CI en verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14. Estado: `done`. |

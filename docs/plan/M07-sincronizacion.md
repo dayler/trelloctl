@@ -1,7 +1,7 @@
 ---
 id: M07
 title: Sincronización, resolución de identificadores y comandos cache
-status: in_review
+status: done
 wave: 4
 depends_on: [M02, M05, M06]
 branch: feature/m07-sincronizacion
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M07 — Sincronización, resolución de identificadores y comandos `cache`
 
-**Estado:** 🔵 En revisión · **Ola:** 4 · **Depende de:** M02, M05, M06 · **Rama:** `feature/m07-sincronizacion`
+**Estado:** 🟢 Completado · **Ola:** 4 · **Depende de:** M02, M05, M06 · **Rama:** `feature/m07-sincronizacion`
 
 ## Objetivo
 
@@ -47,7 +47,7 @@ Comandos `board`, `card`, `inbox` (olas 5 y 6).
 | F2   | Pruebas unitarias                                               | 🟢      |
 | F3   | TCs automatizados                                               | 🟢      |
 | F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | 🟢      |
-| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪      |
+| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | 🟢 |
 
 F5: solo local; PR y CI pendientes de confirmación del usuario.
 
@@ -119,3 +119,4 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 | 2026-11-09 | F3: 51 de 51 TCs automatizados (`test_m07_sync.py`, `test_m07_boards.py`, `test_m07_resolution.py`), cada uno verificado por separado con una sola iteración. Unitarias en `tests/unit/app/test_resolver_unit.py`. |
 | 2026-11-09 | Desviaciones: (1) `tests/acceptance/test_m06_cli.py` TC-M06-022: `config board set not-an-id` pasa de `USAGE` a `BOARD_NOT_FOUND` porque todo valor que no es un id se resuelve como nombre (AC-1.10). (2) El renovado de `cards_fetched_at` tras una recarga incremental usa `Cache._tx()` desde el resolver, porque `infra/cache.py` no expone un método público y no está en la lista Modifica. (3) El texto de ayuda del parámetro `board` de `config board set` en el bloque `config` del registro sigue diciendo «board id»; está fuera del bloque `cache`. (4) `tests/acceptance/m07_support.py` (utilidades compartidas) no estaba en la lista Crea. |
 | 2026-11-09 | F4: `uv sync --all-extras` OK; `ruff check` OK; `ruff format --check` OK; `mypy` OK (23 archivos); `pytest` 412 pasadas, 1 omitida, cobertura 98,63 % (resolver.py 98 %); `check_traceability.py` OK. |
+| 2026-11-09 | F5: PR #8 fusionado en `develop` con merge commit, CI en verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14. Estado: `done`. |

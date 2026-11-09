@@ -1,7 +1,7 @@
 ---
 id: M00
 title: Bootstrap y arnés de pruebas
-status: in_review
+status: done
 wave: 0
 depends_on: []
 branch: feature/m00-bootstrap
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M00 — Bootstrap y arnés de pruebas
 
-**Estado:** 🔵 En revisión · **Ola:** 0 · **Depende de:** — · **Rama:** `feature/m00-bootstrap`
+**Estado:** 🟢 Completado · **Ola:** 0 · **Depende de:** — · **Rama:** `feature/m00-bootstrap`
 
 ## Objetivo
 
@@ -52,7 +52,7 @@ Cualquier lógica de producto. Las rutas concretas de Trello (las añade cada mi
 | F2   | Pruebas unitarias del arnés, del comprobador y del esqueleto (`cli.main()` y `__main__` en proceso, este con `runpy`) para alcanzar el 90 % sobre `trelloctl` | 🟢 |
 | F3   | TCs automatizados de este milestone                                  | 🟢      |
 | F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad      | 🟢      |
-| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`                | ⚪ (local only: PR and CI pending user confirmation)      |
+| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`                | 🟢 |
 
 ## Casos de prueba automatizados
 
@@ -84,3 +84,4 @@ La común del [[00-plan-maestro#Definición de terminado común]], más: CI en v
 | ----- | ------ |
 | 2026-11-09 | F1-F4 completadas en local: empaquetado, esqueleto, Trello falso (núcleo), guardia de red, aislamiento, reloj, comprobador de trazabilidad; 13/13 TCs automatizados y verificados uno a uno; cobertura 100 % sobre `trelloctl` |
 | 2026-11-09 | Las seis comprobaciones locales en verde (sync, ruff check, ruff format, mypy, pytest con cobertura, trazabilidad). F5 pendiente: solo local, PR y CI a la espera de confirmación del usuario |
+| 2026-11-09 | F5: PR #1 fusionado en `develop` con merge commit, CI en verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14. Estado: `done`. |
