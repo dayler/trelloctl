@@ -564,8 +564,9 @@ def test_config_board_set_and_unset(
     assert tomllib.loads(path.read_text(encoding="utf-8")).get("board", {}) == {}
     assert load_settings({}, home=trelloctl_home).board_default == ""
     assert "# keep this comment" in path.read_text(encoding="utf-8")
+    # M07: any value that is not an id is resolved as a shortLink, URL or name.
     code, envelope = run_json(capsys, "config", "board", "set", "not-an-id")
-    assert (code, envelope["error"]["code"]) == (2, "USAGE")
+    assert (code, envelope["error"]["code"]) == (5, "BOARD_NOT_FOUND")
 
 
 @pytest.mark.tc("TC-M06-032")

@@ -322,7 +322,66 @@ def _config() -> list[Operation]:
 
 
 # ==== BEGIN block: cache ====
-# M07 adds the `cache` operations here.
+@block("cache")
+def _cache() -> list[Operation]:
+    from trelloctl.app.commands import cache as cmd
+
+    return [
+        Operation(
+            ("cache", "reload"),
+            "reload the cache of the board from Trello",
+            'trelloctl cache reload --list "To Do"',
+            cmd.reload,
+            params=(
+                Param("list", "reload only the open cards of this list", exclusive="scope"),
+                Param(
+                    "card",
+                    "reload only this card, with attachments and checklists",
+                    exclusive="scope",
+                ),
+                Param(
+                    "archived",
+                    "reload the archived cards of the board",
+                    ParamType.BOOL,
+                    exclusive="scope",
+                ),
+            ),
+            description=(
+                "Without options: the user's boards, the board metadata and its open cards "
+                "(three reads, plus one per further page of 1000 cards), replacing the "
+                "snapshot and renewing its TTLs. With --list, --card or --archived only those "
+                "rows are updated and no TTL is renewed."
+            ),
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("cache", "status"),
+            "age and size of each cached snapshot, and attachment space",
+            "trelloctl cache status",
+            cmd.status,
+            description="Does not call Trello and does not need config.toml.",
+        ),
+        Operation(
+            ("cache", "clear"),
+            "empty the local cache",
+            "trelloctl cache clear --attachments",
+            cmd.clear,
+            params=(
+                Param(
+                    "attachments",
+                    "also delete the downloaded attachments",
+                    ParamType.BOOL,
+                ),
+            ),
+            description=(
+                "Empties cache.db and keeps the downloaded attachments unless --attachments "
+                "is given. Does not call Trello and does not need config.toml."
+            ),
+            mcp=False,
+        ),
+    ]
+
+
 # ==== END block: cache ====
 
 

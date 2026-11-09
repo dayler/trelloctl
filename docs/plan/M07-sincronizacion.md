@@ -1,7 +1,7 @@
 ---
 id: M07
 title: Sincronización, resolución de identificadores y comandos cache
-status: pending
+status: in_review
 wave: 4
 depends_on: [M02, M05, M06]
 branch: feature/m07-sincronizacion
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M07 — Sincronización, resolución de identificadores y comandos `cache`
 
-**Estado:** ⚪ Pendiente · **Ola:** 4 · **Depende de:** M02, M05, M06 · **Rama:** `feature/m07-sincronizacion`
+**Estado:** 🔵 En revisión · **Ola:** 4 · **Depende de:** M02, M05, M06 · **Rama:** `feature/m07-sincronizacion`
 
 ## Objetivo
 
@@ -43,11 +43,13 @@ Comandos `board`, `card`, `inbox` (olas 5 y 6).
 
 | Fase | Descripción                                                     | Estado |
 | ---- | --------------------------------------------------------------- | ------ |
-| F1   | Implementación                                                  | ⚪      |
-| F2   | Pruebas unitarias                                               | ⚪      |
-| F3   | TCs automatizados                                               | ⚪      |
-| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | ⚪      |
+| F1   | Implementación                                                  | 🟢      |
+| F2   | Pruebas unitarias                                               | 🟢      |
+| F3   | TCs automatizados                                               | 🟢      |
+| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | 🟢      |
 | F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪      |
+
+F5: solo local; PR y CI pendientes de confirmación del usuario.
 
 ## Casos de prueba automatizados
 
@@ -113,3 +115,7 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 
 | Fecha | Evento |
 | ----- | ------ |
+| 2026-11-09 | Implementación: `app/resolver.py` (sincronización completa, incremental y parcial; política de rancio; resolución de todas las entidades; referencias rancias con `guarded_write`; `locate_card`; `meta.cache`), `app/commands/cache.py` (`reload`, `status`, `clear`), bloque `cache` del registro, `config board set` por shortLink, URL y nombre, rutas del Trello falso (`members/me/boards`, `boards/{id}` anidado, `cards/open\|closed\|all`, `lists/{id}/cards`, `cards/{id}`). |
+| 2026-11-09 | F3: 51 de 51 TCs automatizados (`test_m07_sync.py`, `test_m07_boards.py`, `test_m07_resolution.py`), cada uno verificado por separado con una sola iteración. Unitarias en `tests/unit/app/test_resolver_unit.py`. |
+| 2026-11-09 | Desviaciones: (1) `tests/acceptance/test_m06_cli.py` TC-M06-022: `config board set not-an-id` pasa de `USAGE` a `BOARD_NOT_FOUND` porque todo valor que no es un id se resuelve como nombre (AC-1.10). (2) El renovado de `cards_fetched_at` tras una recarga incremental usa `Cache._tx()` desde el resolver, porque `infra/cache.py` no expone un método público y no está en la lista Modifica. (3) El texto de ayuda del parámetro `board` de `config board set` en el bloque `config` del registro sigue diciendo «board id»; está fuera del bloque `cache`. (4) `tests/acceptance/m07_support.py` (utilidades compartidas) no estaba en la lista Crea. |
+| 2026-11-09 | F4: `uv sync --all-extras` OK; `ruff check` OK; `ruff format --check` OK; `mypy` OK (23 archivos); `pytest` 412 pasadas, 1 omitida, cobertura 98,63 % (resolver.py 98 %); `check_traceability.py` OK. |
