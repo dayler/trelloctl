@@ -9,8 +9,14 @@ from collections.abc import Mapping
 from typing import Any
 
 from trelloctl.app.commands.context import CommandContext
+from trelloctl.app.resolver import Resolver
 from trelloctl.domain.errors import TrelloctlError
-from trelloctl.infra.settings import API_KEY_ENV, TOKEN_ENV, write_board_default
+from trelloctl.infra.settings import (
+    API_KEY_ENV,
+    TOKEN_ENV,
+    require_credentials,
+    write_board_default,
+)
 
 BOARD_ID = re.compile(r"^[0-9a-fA-F]{24}$")
 _API_ERROR_STATUSES_AS_NOT_FOUND = (400, 401, 403, 404)
@@ -187,16 +193,23 @@ def board_show(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def board_set(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
-    """Store the default board; only a board id is accepted until names are resolvable."""
+    """Store the default board given as an id, shortLink, URL or name (AC-1.9, AC-1.10).
+
+    A board id is stored as given; any other form is resolved against Trello, which needs
+    credentials (`AUTH_MISSING`). Archived boards are considered with the global
+    `--include-archived-boards` (A-24).
+    """
     value = str(args["board"]).strip()
-    if not BOARD_ID.match(value):
-        raise TrelloctlError(
-            "USAGE",
-            "config board set expects a board id (24 hexadecimal characters).",
-            {"board": value},
-        )
-    changed = write_board_default(ctx.settings.config_path, value)
-    return ctx.success({"default": value, "changed": changed}, board_id=value)
+    if not value:
+        raise TrelloctlError("USAGE", "config board set expects a board.", {"board": value})
+    if BOARD_ID.match(value):
+        board_id = value
+    else:
+        require_credentials(ctx.settings)
+        with Resolver(ctx) as resolver:
+            board_id = resolver.resolve_board(value)
+    changed = write_board_default(ctx.settings.config_path, board_id)
+    return ctx.success({"default": board_id, "changed": changed}, board_id=board_id)
 
 
 def board_unset(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
