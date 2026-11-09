@@ -219,6 +219,8 @@ Command: `mcp serve` (experimental; needs the extra `trelloctl[mcp]`).
 named in snake_case (`card_move`, `board_lists`), each returning the same envelope. Where the
 CLI requires `--yes`, the tool requires `yes: true`. The commands `config *`, `doctor`,
 `version`, `skills *`, `cache clear` and `card attachments clear` are not exposed.
+Every tool also takes the optional `board` and `include_archived_boards`. The value `-` (stdin)
+for `desc` and `text` is refused with `USAGE` because stdin is the protocol channel.
 
 Register it once in the harness:
 
