@@ -316,6 +316,95 @@ def _config() -> list[Operation]:
 # ==== END block: card ====
 
 
+# ==== BEGIN block: card attachments ====
+_CARD_PARAM = Param(
+    "card",
+    "card: id, URL, shortLink, idShort or name",
+    positional=True,
+    required=True,
+)
+
+
+@block("card attachments")
+def _card_attachments() -> list[Operation]:
+    from trelloctl.app.commands import attachments as cmd
+
+    return [
+        Operation(
+            ("card", "attachments", "list"),
+            "list the attachments of a card, with the local path of downloaded files",
+            "trelloctl card attachments list 6b00000000000000000000c1",
+            cmd.list_attachments,
+            params=(_CARD_PARAM,),
+            description="Served from the local cache; --fresh reads the card from Trello.",
+            need=Need.CREDENTIALS,
+            cached_read=True,
+        ),
+        Operation(
+            ("card", "attachments", "download"),
+            "download the files of a card (--all) or one file (--id)",
+            "trelloctl card attachments download 6b00000000000000000000c1 --all",
+            cmd.download,
+            params=(
+                _CARD_PARAM,
+                Param(
+                    "all",
+                    "download new and changed files, keep equal ones, delete orphans",
+                    ParamType.BOOL,
+                    required=True,
+                    exclusive="target",
+                ),
+                Param("id", "attachment id to download", exclusive="target"),
+            ),
+            description=(
+                "Reads the card from Trello (one call) and downloads each uploaded file, one "
+                "request at a time, to <HOME>/attachments/<board_id>/<card_id>/. Links are "
+                "reported as skipped. On RATE_LIMITED the error carries what was done in "
+                "error.details.partial."
+            ),
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "attachments", "add"),
+            "upload a file or attach a link to a card",
+            "trelloctl card attachments add 6b00000000000000000000c1 --file report.pdf",
+            cmd.add,
+            params=(
+                _CARD_PARAM,
+                Param(
+                    "file",
+                    "path of the file to upload",
+                    metavar="PATH",
+                    required=True,
+                    exclusive="source",
+                ),
+                Param("url", "link to attach", exclusive="source"),
+                Param("name", "attachment name"),
+            ),
+            description=(
+                "Give --file or --url. A file larger than attachments.max_upload_bytes fails "
+                "with ATTACHMENT_TOO_LARGE before any call to Trello."
+            ),
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "attachments", "clear"),
+            "delete the downloaded files of a card (or one attachment)",
+            "trelloctl card attachments clear 6b00000000000000000000c1",
+            cmd.clear,
+            params=(_CARD_PARAM, Param("id", "attachment id; without it, every file of the card")),
+            description=(
+                "Deletes local copies only, never the attachments in Trello. Does not call "
+                "Trello and does not need config.toml."
+            ),
+            mcp=False,
+        ),
+    ]
+
+
+# ==== END block: card attachments ====
+
+
 # ==== BEGIN block: inbox ====
 # M12 adds the `inbox` operations here.
 # ==== END block: inbox ====

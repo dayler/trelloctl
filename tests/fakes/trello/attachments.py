@@ -1,10 +1,15 @@
-"""Fake Trello routes for attachments: authenticated download and multipart upload.
+"""Fake Trello routes for attachments: listing, authenticated download and creation.
 
-Only what M04 needs; M11 completes the rest of the attachment endpoints.
+``state.attachments[id]`` holds ``{"id", "idCard", "name", "bytes", "mimeType", "date", "url",
+"isUpload", "content"}``; ``content`` (bytes) is what the download route serves and is never
+part of a serialized attachment. Uploads and links receive ``date``, ``mimeType`` and ``url``
+as Trello would assign them.
 """
 
 from __future__ import annotations
 
+import mimetypes
+from datetime import UTC, datetime
 from email import message_from_bytes
 from typing import Any
 
@@ -29,7 +34,25 @@ def parse_multipart(content_type: str, body: bytes) -> dict[str, dict[str, Any]]
     return fields
 
 
+def _now() -> str:
+    return datetime.now(UTC).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
+def public(item: dict[str, Any]) -> dict[str, Any]:
+    return {k: v for k, v in item.items() if k != "content"}
+
+
 def register(router: Router) -> None:
+    @router.route("GET", "/cards/{card}/attachments")
+    def list_attachments(req: Request) -> Response | list[dict[str, Any]]:
+        card = req.params["card"]
+        known = req.state.cards.get(card) or next(
+            (c for c in req.state.cards.values() if c.get("shortLink") == card), None
+        )
+        if known is None:
+            return text_response("The requested resource was not found.", 404)
+        return [public(a) for a in req.state.attachments.values() if a.get("idCard") == known["id"]]
+
     @router.route("GET", "/cards/{card}/attachments/{att}/download/{name}", auth="oauth")
     def download(req: Request) -> Response:
         attachment = req.state.attachments.get(req.params["att"])
@@ -46,6 +69,9 @@ def register(router: Router) -> None:
                 "idCard": req.params["card"],
                 "name": req.param("name") or req.param("url"),
                 "url": req.param("url"),
+                "bytes": None,
+                "mimeType": "",
+                "date": _now(),
                 "isUpload": False,
             }
             req.state.attachments[attachment_id] = link
@@ -65,8 +91,14 @@ def register(router: Router) -> None:
             "name": name,
             "fileName": file["filename"],
             "bytes": len(file["content"]),
+            "mimeType": mimetypes.guess_type(str(file["filename"] or ""))[0] or "",
+            "date": _now(),
+            "url": (
+                f"https://trello.com/1/cards/{req.params['card']}/attachments/{attachment_id}"
+                f"/download/{file['filename']}"
+            ),
             "isUpload": True,
             "content": file["content"],
         }
         req.state.attachments[attachment_id] = record
-        return {k: v for k, v in record.items() if k != "content"}
+        return public(record)
