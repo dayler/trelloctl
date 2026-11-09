@@ -1,7 +1,7 @@
 ---
 id: M06
 title: Registro, CLI, ayuda, versión y comandos config
-status: in_progress
+status: in_review
 wave: 3
 depends_on: [M01, M03, M04]
 branch: feature/m06-cli
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M06 — Registro, CLI, ayuda, versión y comandos `config`
 
-**Estado:** 🟡 En curso · **Ola:** 3 · **Depende de:** M01, M03, M04 · **Rama:** `feature/m06-cli`
+**Estado:** 🔵 En revisión · **Ola:** 3 · **Depende de:** M01, M03, M04 · **Rama:** `feature/m06-cli`
 
 ## Objetivo
 
@@ -44,8 +44,8 @@ Resolución de tableros por nombre (M07), comandos de los demás grupos.
 | ---- | --------------------------------------------------------------- | ------ |
 | F1   | Implementación                                                  | 🟢      |
 | F2   | Pruebas unitarias                                               | 🟢      |
-| F3   | TCs automatizados                                               | 🟡      |
-| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | ⚪      |
+| F3   | TCs automatizados                                               | 🟢      |
+| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | 🟢      |
 | F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪      |
 
 ## Casos de prueba automatizados
@@ -94,3 +94,8 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 
 | Fecha | Evento |
 | ----- | ------ |
+| 2026-11-09 | Inicio de M06 en la rama `feature/m06-cli`; F1 y F2: `registry.py` con bloques por grupo, `cli.py` generado del registro, `app/commands/{context,config,version}.py` y Trello falso `boards.py` (solo `GET /boards/{id}`) |
+| 2026-11-09 | F3: 33 TCs automatizados (TC-M06-013 se omite en Windows, como indica su fila); cada TC verificado por separado, sin iteraciones extra |
+| 2026-11-09 | F4: ruff check, ruff format --check, mypy, pytest con cobertura (99,26 %, 262 pruebas, 1 omitida) y trazabilidad en verde |
+| 2026-11-09 | Decisiones: `Need` (NONE, CONFIG_EXISTS, CONFIG, CREDENTIALS, BOARD) como precondición de cada operación; `check_preconditions` y `execute` son el punto único de validación y despacho reutilizable por MCP; `Outcome` permite texto y código de salida propios (doctor, mcp serve); `config board set` solo admite ids de 24 hexadecimales hasta que M07 añada la resolución; `--yes` ausente se responde en `execute` con `CONFIRMATION_REQUIRED`; `meta.cache.stale` produce salida 9 |
+| 2026-11-09 | Desviación: se eliminó de `tests/unit/test_skeleton.py` la prueba de argumentos no soportados del `cli.py` mínimo de M00, obsoleta al sustituirlo. F5 pendiente: solo local, PR y CI a la espera de confirmación del usuario |
