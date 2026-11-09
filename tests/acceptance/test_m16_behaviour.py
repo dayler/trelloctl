@@ -75,9 +75,8 @@ def test_every_json_command_declares_schema_version_1_on_success_and_on_error(
 
 # --- TC-M16-006 --------------------------------------------------------------------------
 
-# Scenario -> (command, whether the second run is answered without any write). Label, member
-# and item operations skip the request when the state already matches; archiving and
-# completing send the same PUT again, which Trello accepts as a no-op (RNF-6: not an error).
+# Scenario -> (command, whether the second run is answered without any write). Every
+# operation skips the request when the state already matches (RNF-6).
 IDEMPOTENT = {
     "label already on the card": (("card", "label", "add", REVIEW, "bug"), True),
     "member added twice": (("card", "member", "add", REVIEW, "ana"), True),
@@ -85,9 +84,9 @@ IDEMPOTENT = {
         ("card", "checklist", "item", "check", REVIEW, "QA", "e2e tests"),
         True,
     ),
-    "card archived twice": (("card", "archive", REVIEW), False),
-    "card done twice": (("card", "done", REVIEW), False),
-    "list archived twice": (("board", "list", "archive", "Done"), False),
+    "card archived twice": (("card", "archive", REVIEW), True),
+    "card done twice": (("card", "done", REVIEW), True),
+    "list archived twice": (("board", "list", "archive", "Done"), True),
 }
 
 
@@ -113,10 +112,8 @@ def test_repeating_an_idempotent_operation_is_ok_and_changes_nothing(
         code, again = env.run(*argv)
         assert (code, again["ok"]) == (0, True)
         sent = [(r.method, r.path) for r in writes(env.fake)]
-        if quiet:
-            assert sent == []
-        else:
-            assert len(sent) <= 1, sent
+        assert quiet
+        assert sent == []
         after = steady(env.fake)
         assert after == before
 

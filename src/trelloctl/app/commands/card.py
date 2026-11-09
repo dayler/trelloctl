@@ -869,35 +869,43 @@ def update(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _simple(
-    ctx: CommandContext, args: Mapping[str, Any], params: dict[str, QueryValue]
+    ctx: CommandContext,
+    args: Mapping[str, Any],
+    params: dict[str, QueryValue],
+    column: str,
+    wanted: bool,
 ) -> dict[str, Any]:
+    """Set a boolean state; when the card is already in it nothing is sent (RNF-6)."""
     ref = str(args["card"])
     with _session(ctx) as s:
         located = s.resolver.locate_card(ref, write=True)
         board_id = located.board_id
-        stored = _write_card(s, board_id, ref, params)
+        if bool(located.card[column]) == wanted:
+            stored = located.card
+        else:
+            stored = _write_card(s, board_id, ref, params)
         view = _view_of(s, board_id, stored)
     return ctx.success(view, board_id=board_id)
 
 
 def done(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
     """`card done`: `dueComplete = true`; no due date is needed (AC-16.2)."""
-    return _simple(ctx, args, {"dueComplete": True})
+    return _simple(ctx, args, {"dueComplete": True}, "due_complete", True)
 
 
 def undone(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
     """`card undone`: `dueComplete = false` (AC-16.2)."""
-    return _simple(ctx, args, {"dueComplete": False})
+    return _simple(ctx, args, {"dueComplete": False}, "due_complete", False)
 
 
 def archive(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
     """`card archive`: `closed = true`; archiving an archived card is not an error (RNF-6)."""
-    return _simple(ctx, args, {"closed": True})
+    return _simple(ctx, args, {"closed": True}, "archived", True)
 
 
 def unarchive(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
     """`card unarchive`: `closed = false`; the card returns to its list (AC-16.3)."""
-    return _simple(ctx, args, {"closed": False})
+    return _simple(ctx, args, {"closed": False}, "archived", False)
 
 
 # --- comments (RF-17) -------------------------------------------------------------------------
