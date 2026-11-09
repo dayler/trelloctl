@@ -1,5 +1,6 @@
-"""`card` commands: create, get, list, search, move, copy, update, done, undone, archive and
-unarchive (RF-12 to RF-16, AC-7.3, AC-7.4, AC-22.9, AC-22.11, AC-22.13, A-3, A-15, A-20, A-21).
+"""`card` commands: create, get, list, search, move, copy, update, done, undone, archive,
+unarchive, comments, labels and members (RF-12 to RF-19, AC-7.3, AC-7.4, AC-22.9, AC-22.11,
+AC-22.13, A-3, A-13, A-15, A-20 to A-22).
 
 Every function returns its envelope as data. Reads are served from the cache through the
 `Resolver`; writes send ids, update the cache with the response of Trello (write-through,
@@ -20,7 +21,7 @@ from typing import Any
 
 from trelloctl.app import search
 from trelloctl.app.commands.context import CommandContext
-from trelloctl.app.resolver import Resolver, iso_utc
+from trelloctl.app.resolver import Resolver, iso_utc, looks_stale, not_found
 from trelloctl.domain.errors import TrelloctlError
 from trelloctl.domain.models import Comment, TrelloList
 from trelloctl.domain.mover import compute_shift, open_lists, parse_index, to_trello_pos
@@ -53,6 +54,8 @@ CARD_FIELDS = (
 )
 SEARCH_RESULT_FIELDS = (*CARD_FIELDS, "matched", "comment_ids")
 COMMENTS_LIMIT = 1000
+COMMENT_FIELDS = ("id", "text", "date", "memberId", "member")
+MAX_COMMENT = 16384
 _DATE_ONLY = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
@@ -133,6 +136,28 @@ def read_description(args: Mapping[str, Any]) -> str | None:
             f"The description has {len(text)} characters; the maximum is {MAX_DESC}.",
             length=len(text),
             max=MAX_DESC,
+        )
+    return text
+
+
+def read_text(args: Mapping[str, Any]) -> str:
+    """`--text`, `--text-file` or `--text -` (stdin), exactly one, sent as is (A-13)."""
+    _exclusive(args, "text", "text_file")
+    if args.get("text_file") is not None:
+        text = _read_file(str(args["text_file"]))
+    elif args.get("text") == "-":
+        text = _read_stdin()
+    elif args.get("text") is not None:
+        text = str(args["text"])
+    else:
+        raise _usage("Give --text, --text-file or --text - (standard input).")
+    if not text.strip():
+        raise _usage("The comment text must not be empty.")
+    if len(text) > MAX_COMMENT:
+        raise _usage(
+            f"The comment has {len(text)} characters; the maximum is {MAX_COMMENT}.",
+            length=len(text),
+            max=MAX_COMMENT,
         )
     return text
 
@@ -458,26 +483,26 @@ def _ensure_fresh_card(s: _Session, board_id: str, row: Row) -> Row:
     return s.cache.get_card(board_id, row["id"]) or row
 
 
+def _comment_json(item: Mapping[str, Any], catalog: Catalog) -> dict[str, Any]:
+    comment = Comment.from_json(item)
+    creator = item.get("memberCreator")
+    username = creator.get("username") if isinstance(creator, Mapping) else None
+    member = catalog.members.get(comment.member_id or "")
+    return {
+        "id": comment.id,
+        "text": comment.text,
+        "date": comment.date,
+        "memberId": comment.member_id,
+        "member": username or (member["username"] if member else None),
+    }
+
+
 def _comments_of(s: _Session, card_id: str, catalog: Catalog) -> list[dict[str, Any]]:
     data = s.resolver.client.get(
         f"/cards/{card_id}/actions", {"filter": "commentCard", "limit": COMMENTS_LIMIT}
     )
-    out: list[dict[str, Any]] = []
-    for item in data if isinstance(data, list) else []:
-        if not isinstance(item, Mapping):
-            continue
-        comment = Comment.from_json(item)
-        member = catalog.members.get(comment.member_id or "")
-        out.append(
-            {
-                "id": comment.id,
-                "text": comment.text,
-                "date": comment.date,
-                "memberId": comment.member_id,
-                "member": member["username"] if member else None,
-            }
-        )
-    return out
+    items = data if isinstance(data, list) else []
+    return [_comment_json(i, catalog) for i in items if isinstance(i, Mapping)]
 
 
 def get(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
@@ -873,3 +898,195 @@ def archive(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
 def unarchive(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
     """`card unarchive`: `closed = false`; the card returns to its list (AC-16.3)."""
     return _simple(ctx, args, {"closed": False})
+
+
+# --- comments (RF-17) -------------------------------------------------------------------------
+
+
+def _fetch_comments(s: _Session, card_id: str, limit: int | None) -> tuple[list[Row], bool]:
+    """Comments newest first, in pages of 1000; one more than `limit` tells it was truncated."""
+    found: list[Row] = []
+    before: str | None = None
+    while True:
+        want = COMMENTS_LIMIT if limit is None else min(limit + 1 - len(found), COMMENTS_LIMIT)
+        params: dict[str, QueryValue] = {"filter": "commentCard", "limit": want, "before": before}
+        data = s.resolver.client.get(f"/cards/{card_id}/actions", params)
+        page: list[Row] = (
+            [dict(i) for i in data if isinstance(i, Mapping)] if isinstance(data, list) else []
+        )
+        found.extend(page)
+        if len(page) < want or not page[-1].get("id"):
+            break
+        if limit is not None and len(found) > limit:
+            break
+        before = str(page[-1]["id"])
+    if limit is not None and len(found) > limit:
+        return found[:limit], True
+    return found, False
+
+
+def comments(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
+    """`card comments`: the comments of a card, never cached (AC-17.1, AC-13.4)."""
+    limit = _limit(args.get("limit"))
+    fields = _fields(args.get("fields"), COMMENT_FIELDS)
+    with _session(ctx) as s:
+        located = s.resolver.locate_card(str(args["card"]))
+        board_id, row = located.board_id, located.card
+        s.resolver.ensure_metadata(board_id)
+        catalog = catalog_of(s.cache, board_id)
+        items, truncated = _fetch_comments(s, row["id"], limit)
+        out = [_project(_comment_json(i, catalog), fields) for i in items]
+    return ctx.success({"comments": out}, board_id=board_id, meta={"truncated": truncated})
+
+
+def _set_badges(s: _Session, board_id: str, card_id: str, **changes: int) -> None:
+    row = s.cache.get_card(board_id, card_id)
+    if row is None:  # pragma: no cover - the card was just located
+        return
+    badges = {
+        "comments": row["badge_comments"] or 0,
+        "attachments": row["badge_attachments"] or 0,
+        "checkItems": row["badge_check_items"] or 0,
+        "checkItemsChecked": row["badge_check_items_checked"] or 0,
+    }
+    badges.update(changes)
+    _store(s, board_id, {"id": card_id, "badges": badges}, row)
+
+
+def _comment_error(exc: TrelloctlError, ref: str) -> TrelloctlError:
+    return not_found("comment", ref) if looks_stale(exc) else exc
+
+
+def comment_add(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
+    """`card comment add`: a comment with the text as is; mentions are Trello's (AC-17.2)."""
+    text = read_text(args)
+    ref = str(args["card"])
+    with _session(ctx) as s:
+        located = s.resolver.locate_card(ref, write=True)
+        board_id = located.board_id
+
+        def call(row: Row) -> Any:
+            return s.resolver.client.post(f"/cards/{row['id']}/actions/comments", {"text": text})
+
+        data = s.resolver.guarded_write("card", board_id, ref, call)
+        if not isinstance(data, Mapping) or not data.get("id"):
+            raise TrelloctlError("API_ERROR", "Trello returned an unexpected comment.", {})
+        current = s.cache.get_card(board_id, located.card["id"]) or located.card
+        _set_badges(s, board_id, current["id"], comments=(current["badge_comments"] or 0) + 1)
+        view = _comment_json(data, catalog_of(s.cache, board_id))
+    return ctx.success(view, board_id=board_id)
+
+
+def comment_edit(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
+    """`card comment edit`: replace the text of a comment of the token's member (AC-17.3)."""
+    text = read_text(args)
+    with _session(ctx) as s:
+        located = s.resolver.locate_card(str(args["card"]), write=True)
+        board_id, card_id = located.board_id, located.card["id"]
+        comment_id = s.resolver.resolve_comment(str(args["comment"]))
+        try:
+            data = s.resolver.client.put(
+                f"/cards/{card_id}/actions/{comment_id}/comments", {"text": text}
+            )
+        except TrelloctlError as exc:
+            raise _comment_error(exc, str(args["comment"])) from exc
+        item = data if isinstance(data, Mapping) and data.get("id") else {"id": comment_id}
+        view = _comment_json(item, catalog_of(s.cache, board_id))
+        view["text"] = text
+    return ctx.success(view, board_id=board_id)
+
+
+def comment_remove(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
+    """`card comment remove`: delete a comment of the token's member (AC-17.3, AC-16.4)."""
+    with _session(ctx) as s:
+        located = s.resolver.locate_card(str(args["card"]), write=True)
+        board_id, row = located.board_id, located.card
+        comment_id = s.resolver.resolve_comment(str(args["comment"]))
+        try:
+            s.resolver.client.delete(f"/cards/{row['id']}/actions/{comment_id}/comments")
+        except TrelloctlError as exc:
+            raise _comment_error(exc, str(args["comment"])) from exc
+        current = s.cache.get_card(board_id, row["id"]) or row
+        _set_badges(s, board_id, row["id"], comments=max((current["badge_comments"] or 0) - 1, 0))
+    return ctx.success({"deleted": comment_id, "card": row["id"]}, board_id=board_id)
+
+
+# --- labels and members of a card (RF-18, RF-19) ----------------------------------------------
+
+_RELATIONS = {
+    "label": ("labels", "id_labels", "idLabels"),
+    "member": ("members", "id_members", "idMembers"),
+}
+
+
+def _write_relation(
+    s: _Session, board_id: str, card_id: str, kind: str, action: str, ref: str
+) -> None:
+    path = f"/cards/{card_id}/{_RELATIONS[kind][2]}"
+
+    def call(entity: Row) -> Any:
+        if action == "add":
+            return s.resolver.client.post(path, {"value": entity["id"]})
+        return s.resolver.client.delete(f"{path}/{entity['id']}")
+
+    s.resolver.guarded_write(kind, board_id, ref, call)
+
+
+def _relation(
+    ctx: CommandContext, args: Mapping[str, Any], kind: str, action: str
+) -> dict[str, Any]:
+    """`card label|member add|remove|set`: idempotent; every value resolves before any write."""
+    key, column, json_key = _RELATIONS[kind]
+    refs = [str(r) for r in args[key]]
+    ref = str(args["card"])
+    with _session(ctx) as s:
+        located = s.resolver.locate_card(ref, write=True)
+        board_id, card_id = located.board_id, located.card["id"]
+        ids = _resolve_ids(s, board_id, refs, kind) or []
+        if action == "set":
+            _write_card(s, board_id, ref, {json_key: ",".join(dict.fromkeys(ids))})
+        else:
+            current: list[str] = list(located.card[column])
+            for item_id, item_ref in dict.fromkeys(zip(ids, refs, strict=True)):
+                if (item_id in current) == (action == "add"):
+                    continue
+                _write_relation(s, board_id, card_id, kind, action, item_ref)
+                if action == "add":
+                    current = [*current, item_id]
+                else:
+                    current = [i for i in current if i != item_id]
+                _store(s, board_id, {"id": card_id, json_key: current})
+        row = s.cache.get_card(board_id, card_id) or located.card
+        view = _view_of(s, board_id, row)
+    data = {"id": view["id"], "name": view["name"], key: view[key]}
+    return ctx.success(data, board_id=board_id)
+
+
+def label_add(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
+    """`card label add`: labels not yet on the card (AC-18.1)."""
+    return _relation(ctx, args, "label", "add")
+
+
+def label_remove(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
+    """`card label remove`: labels that are on the card (AC-18.1)."""
+    return _relation(ctx, args, "label", "remove")
+
+
+def label_set(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
+    """`card label set`: exactly these labels, as `card update --labels` (AC-18.1)."""
+    return _relation(ctx, args, "label", "set")
+
+
+def member_add(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
+    """`card member add`: members not yet on the card (AC-19.1)."""
+    return _relation(ctx, args, "member", "add")
+
+
+def member_remove(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
+    """`card member remove`: members that are on the card (AC-19.1)."""
+    return _relation(ctx, args, "member", "remove")
+
+
+def member_set(ctx: CommandContext, args: Mapping[str, Any]) -> dict[str, Any]:
+    """`card member set`: exactly these members, as `card update --members` (AC-19.1)."""
+    return _relation(ctx, args, "member", "set")

@@ -827,6 +827,294 @@ def _card_attachments() -> list[Operation]:
 # ==== END block: card attachments ====
 
 
+# ==== BEGIN block: card comment ====
+_DETAIL_CARD = Param(
+    "card",
+    "card: id, URL, shortLink, idShort or name",
+    positional=True,
+    required=True,
+    metavar="CARD",
+)
+_COMMENT_TEXT = (
+    Param("text", "comment text; - reads standard input (UTF-8)", exclusive="text", required=True),
+    Param("text_file", "read the text from a UTF-8 file", metavar="PATH", exclusive="text"),
+)
+_COMMENT_REF = Param("comment", "comment id", positional=True, required=True)
+
+
+@block("card comment")
+def _card_comment() -> list[Operation]:
+    from trelloctl.app.commands import card as cmd
+
+    return [
+        Operation(
+            ("card", "comments"),
+            "list the comments of a card (never cached)",
+            "trelloctl card comments 6b00000000000000000000c1 --limit 10",
+            cmd.comments,
+            params=(
+                _DETAIL_CARD,
+                Param("limit", "maximum comments (default 50; 0 = no limit)", ParamType.INT),
+                Param(
+                    "fields",
+                    "comma-separated fields to keep",
+                    ParamType.CSV,
+                ),
+            ),
+            description="Newest first. Every call reads the comments from Trello.",
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "comment", "add"),
+            "add a comment to a card",
+            'trelloctl card comment add 6b00000000000000000000c1 --text "Done, @ana"',
+            cmd.comment_add,
+            params=(_DETAIL_CARD, *_COMMENT_TEXT),
+            description=(
+                "The text is sent as is (Markdown); @username mentions notify the member. "
+                "Prints the id of the new comment."
+            ),
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "comment", "edit"),
+            "replace the text of one of your comments",
+            'trelloctl card comment edit 6b00000000000000000000c1 <comment-id> --text "New"',
+            cmd.comment_edit,
+            params=(_DETAIL_CARD, _COMMENT_REF, *_COMMENT_TEXT),
+            description="Only comments created with the configured token can be edited.",
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "comment", "remove"),
+            "delete one of your comments",
+            "trelloctl card comment remove 6b00000000000000000000c1 <comment-id> --yes",
+            cmd.comment_remove,
+            params=(_DETAIL_CARD, _COMMENT_REF),
+            description="Irreversible. Only comments created with the configured token.",
+            need=Need.CREDENTIALS,
+            requires_yes=True,
+        ),
+    ]
+
+
+# ==== END block: card comment ====
+
+
+# ==== BEGIN block: card label ====
+@block("card label")
+def _card_label() -> list[Operation]:
+    from trelloctl.app.commands import card as cmd
+
+    labels = Param(
+        "labels",
+        "labels: ids, names or name:color",
+        ParamType.CSV,
+        positional=True,
+        required=True,
+    )
+    return [
+        Operation(
+            ("card", "label", "add"),
+            "add labels to a card; the ones already present are ignored",
+            "trelloctl card label add 6b00000000000000000000c1 bug,urgent",
+            cmd.label_add,
+            params=(_DETAIL_CARD, labels),
+            description="Every label must exist; otherwise nothing is written.",
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "label", "remove"),
+            "remove labels from a card; the ones absent are ignored",
+            "trelloctl card label remove 6b00000000000000000000c1 bug",
+            cmd.label_remove,
+            params=(_DETAIL_CARD, labels),
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "label", "set"),
+            "leave exactly these labels on a card",
+            "trelloctl card label set 6b00000000000000000000c1 bug,urgent",
+            cmd.label_set,
+            params=(_DETAIL_CARD, labels),
+            description="Equivalent to `card update --labels`.",
+            need=Need.CREDENTIALS,
+        ),
+    ]
+
+
+# ==== END block: card label ====
+
+
+# ==== BEGIN block: card member ====
+@block("card member")
+def _card_member() -> list[Operation]:
+    from trelloctl.app.commands import card as cmd
+
+    members = Param(
+        "members",
+        "members: ids, usernames or full names",
+        ParamType.CSV,
+        positional=True,
+        required=True,
+    )
+    return [
+        Operation(
+            ("card", "member", "add"),
+            "assign members to a card; the ones already assigned are ignored",
+            "trelloctl card member add 6b00000000000000000000c1 ana,luis",
+            cmd.member_add,
+            params=(_DETAIL_CARD, members),
+            description="Every member must exist; otherwise nothing is written.",
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "member", "remove"),
+            "unassign members from a card; the ones absent are ignored",
+            "trelloctl card member remove 6b00000000000000000000c1 ana",
+            cmd.member_remove,
+            params=(_DETAIL_CARD, members),
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "member", "set"),
+            "leave exactly these members on a card",
+            "trelloctl card member set 6b00000000000000000000c1 ana,luis",
+            cmd.member_set,
+            params=(_DETAIL_CARD, members),
+            description="Equivalent to `card update --members`.",
+            need=Need.CREDENTIALS,
+        ),
+    ]
+
+
+# ==== END block: card member ====
+
+
+# ==== BEGIN block: card checklist ====
+@block("card checklist")
+def _card_checklist() -> list[Operation]:
+    from trelloctl.app.commands import checklists as cmd
+
+    checklist = Param("checklist", "checklist: id or name", positional=True, required=True)
+    items = Param("items", "items: ids or names", ParamType.CSV, positional=True, required=True)
+    pos = Param("pos", "top, bottom or final index (0-based)", metavar="POS")
+    state_items = (
+        _DETAIL_CARD,
+        checklist,
+        Param("items", "items: ids or names", ParamType.CSV, positional=True, nargs="?"),
+        Param("all", "every item of the checklist", ParamType.BOOL),
+    )
+    return [
+        Operation(
+            ("card", "checklist", "list"),
+            "list the checklists of a card with progress and items",
+            "trelloctl card checklist list 6b00000000000000000000c1",
+            cmd.list_checklists,
+            params=(_DETAIL_CARD,),
+            description="Served from the local cache; --fresh reads the card from Trello.",
+            need=Need.CREDENTIALS,
+            cached_read=True,
+        ),
+        Operation(
+            ("card", "checklist", "add"),
+            "create a checklist, optionally with initial items",
+            "trelloctl card checklist add 6b00000000000000000000c1 --name QA --items a,b,c",
+            cmd.add,
+            params=(
+                _DETAIL_CARD,
+                Param("name", "checklist name", required=True),
+                pos,
+                Param("items", "initial items", ParamType.CSV, exclusive="items"),
+                Param(
+                    "items_file",
+                    "read items from a UTF-8 file, one per line",
+                    metavar="PATH",
+                    exclusive="items",
+                ),
+            ),
+            description="The checklist is created first and then each item, in order.",
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "checklist", "rename"),
+            "rename a checklist",
+            "trelloctl card checklist rename 6b00000000000000000000c1 QA --name Tests",
+            cmd.rename,
+            params=(_DETAIL_CARD, checklist, Param("name", "new name", required=True)),
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "checklist", "remove"),
+            "delete a checklist with its items",
+            "trelloctl card checklist remove 6b00000000000000000000c1 QA --yes",
+            cmd.remove,
+            params=(_DETAIL_CARD, checklist),
+            description="Irreversible.",
+            need=Need.CREDENTIALS,
+            requires_yes=True,
+        ),
+        Operation(
+            ("card", "checklist", "item", "add"),
+            "add an item to a checklist",
+            "trelloctl card checklist item add 6b00000000000000000000c1 QA --name e2e --checked",
+            cmd.item_add,
+            params=(
+                _DETAIL_CARD,
+                checklist,
+                Param("name", "item name", required=True),
+                pos,
+                Param("checked", "create the item already checked", ParamType.BOOL),
+            ),
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "checklist", "item", "check"),
+            "mark items as complete; the ones already complete are ignored",
+            "trelloctl card checklist item check 6b00000000000000000000c1 QA a,b",
+            cmd.item_check,
+            params=state_items,
+            description="Give the items, or --all for every item of the checklist.",
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "checklist", "item", "uncheck"),
+            "mark items as incomplete; the ones already incomplete are ignored",
+            "trelloctl card checklist item uncheck 6b00000000000000000000c1 QA --all",
+            cmd.item_uncheck,
+            params=state_items,
+            description="Give the items, or --all for every item of the checklist.",
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "checklist", "item", "rename"),
+            "rename a checklist item",
+            "trelloctl card checklist item rename 6b00000000000000000000c1 QA a --name a2",
+            cmd.item_rename,
+            params=(
+                _DETAIL_CARD,
+                checklist,
+                Param("item", "item: id or name", positional=True, required=True),
+                Param("name", "new name", required=True),
+            ),
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "checklist", "item", "remove"),
+            "delete checklist items",
+            "trelloctl card checklist item remove 6b00000000000000000000c1 QA a,b --yes",
+            cmd.item_remove,
+            params=(_DETAIL_CARD, checklist, items),
+            description="Irreversible.",
+            need=Need.CREDENTIALS,
+            requires_yes=True,
+        ),
+    ]
+
+
+# ==== END block: card checklist ====
+
+
 # ==== BEGIN block: inbox ====
 @block("inbox")
 def _inbox() -> list[Operation]:
