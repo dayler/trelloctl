@@ -1,7 +1,7 @@
 ---
 id: M10
 title: Detalle de tarjeta — comentarios, etiquetas, miembros y checklists
-status: pending
+status: in_review
 wave: 6
 depends_on: [M09]
 branch: feature/m10-detalle-tarjeta
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M10 — Detalle de tarjeta: comentarios, etiquetas, miembros y checklists
 
-**Estado:** ⚪ Pendiente · **Ola:** 6 · **Depende de:** M09 · **Rama:** `feature/m10-detalle-tarjeta`
+**Estado:** 🔵 En revisión · **Ola:** 6 · **Depende de:** M09 · **Rama:** `feature/m10-detalle-tarjeta`
 
 ## Objetivo
 
@@ -34,17 +34,17 @@ Adjuntos (M11).
 ## Archivos
 
 - **Crea:** `src/trelloctl/app/commands/checklists.py`, `tests/fakes/trello/comments_write.py`, `checklists.py`, `card_relations.py`, `tests/unit/app/commands/test_checklists*`, `tests/acceptance/test_m10_*`.
-- **Modifica:** `src/trelloctl/app/commands/card.py` (subgrupos `comment`, `label`, `member`), `registry.py` (bloques `card comment|label|member|checklist`).
+- **Modifica:** `src/trelloctl/app/commands/card.py` (subgrupos `comment`, `label`, `member`), `registry.py` (bloques `card comment`, `card label`, `card member` y `card checklist`).
 - **No toca:** `inbox.py` (M12, misma ola), `infra/`, `domain/`, `app/resolver.py`.
 
 ## Fases
 
 | Fase | Descripción                                                     | Estado |
 | ---- | --------------------------------------------------------------- | ------ |
-| F1   | Implementación                                                  | ⚪      |
-| F2   | Pruebas unitarias                                               | ⚪      |
-| F3   | TCs automatizados                                               | ⚪      |
-| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | ⚪      |
+| F1   | Implementación                                                  | 🟢      |
+| F2   | Pruebas unitarias                                               | 🟢      |
+| F3   | TCs automatizados                                               | 🟢      |
+| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | 🟢      |
 | F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪      |
 
 ## Casos de prueba automatizados
@@ -99,3 +99,8 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 
 | Fecha | Evento |
 | ----- | ------ |
+| 2026-11-09 | F1 y F2: `app/commands/checklists.py`, subgrupos `comments`, `comment`, `label` y `member` en `app/commands/card.py`, bloques `card comment`, `card label`, `card member` y `card checklist` del registro y pruebas unitarias |
+| 2026-11-09 | F3: 39 de 39 TCs automatizados (nivel E) con Trello falso ampliado: `comments_write.py`, `card_relations.py`, `checklists.py`; verificados uno a uno por su marcador |
+| 2026-11-09 | Nota: `card checklist item check` y `uncheck` declara `items` como posicional opcional (`nargs="?"`) para admitir `--all`; las respuestas de checklist añaden `progress`, `checked` y `total` |
+| 2026-11-09 | F4: ruff check, ruff format --check, mypy, pytest con cobertura y trazabilidad en verde (ver informe final) |
+| 2026-11-09 | F5 pendiente: solo local, PR y CI a la espera de confirmación del usuario |
