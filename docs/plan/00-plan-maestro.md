@@ -254,7 +254,7 @@ Aclaraciones que prevalecen sobre la letra del PRD v1.0.0 o la amplían. En la p
 - Lint, formato y tipado estricto sin errores.
 - El comprobador de trazabilidad pasa.
 - Ninguna prueba sale a Internet ni usa credenciales reales.
-- Todo texto que la herramienta emite o instala está en inglés (RNF-10); `docs/` sigue en español.
+- Todo texto que la herramienta emite o instala está en inglés (RNF-10); `docs/` y `README.md` están en español (el README queda fuera de la comprobación de idioma).
 - Ningún commit, PR, comentario de código ni documento atribuye la autoría a herramientas o modelos de IA.
 - PR contra `develop` con CI verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14, fusionado con merge commit.
 - Semáforos y bitácora del milestone al día.
@@ -274,3 +274,4 @@ El workflow `.github/workflows/ci.yml` corre en cada PR contra `develop` o `main
 | 2026-11-09 | Aclaración A-23 (`config init` escribe la configuración mínima y el resto comentado) decidida por el responsable (+1 TC) |
 | 2026-11-09 | Aclaración A-24 (`--include-archived-boards`) decidida por el responsable; caché de tableros desaparecidos anotado para conciliación con el PRD (+6 TCs) |
 | 2026-11-09 | Segunda revisión independiente: A-25 y ampliaciones de A-15, A-19 y A-22 resueltas con la opción más sencilla; inventario de endpoints movido a M14; localización de tarjetas sin tablero en M07; TCs ajustados (+5 netos) |
+| 2026-11-09 | El responsable decide que `README.md` va en español (única excepción fuera de `docs/`) y queda excluido de la comprobación RNF-10; ajustados `CLAUDE.md`, M15 y M16 |
