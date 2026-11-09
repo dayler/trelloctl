@@ -359,11 +359,7 @@ class Resolver:
         return len(cards)
 
     def _renew_cards_stamp(self, board_id: str, moment: datetime) -> None:
-        with self.cache._tx() as conn:
-            conn.execute(
-                "UPDATE boards SET cards_fetched_at = ?, cards_stale = 0 WHERE board_id = ?",
-                (moment.timestamp(), board_id),
-            )
+        self.cache.touch_cards(board_id, moment)
 
     def sync_archived(self, board_id: str) -> int:
         """Replace the archived cards with `cards/closed`; renews `archived_fetched_at`."""
