@@ -1,7 +1,7 @@
 ---
 id: M00
 title: Bootstrap y arnés de pruebas
-status: pending
+status: in_review
 wave: 0
 depends_on: []
 branch: feature/m00-bootstrap
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M00 — Bootstrap y arnés de pruebas
 
-**Estado:** ⚪ Pendiente · **Ola:** 0 · **Depende de:** — · **Rama:** `feature/m00-bootstrap`
+**Estado:** 🔵 En revisión · **Ola:** 0 · **Depende de:** — · **Rama:** `feature/m00-bootstrap`
 
 ## Objetivo
 
@@ -48,11 +48,11 @@ Cualquier lógica de producto. Las rutas concretas de Trello (las añade cada mi
 
 | Fase | Descripción                                                          | Estado |
 | ---- | -------------------------------------------------------------------- | ------ |
-| F1   | Implementación (empaquetado, esqueleto, arnés, comprobador)          | ⚪      |
-| F2   | Pruebas unitarias del arnés, del comprobador y del esqueleto (`cli.main()` y `__main__` en proceso, este con `runpy`) para alcanzar el 90 % sobre `trelloctl` | ⚪ |
-| F3   | TCs automatizados de este milestone                                  | ⚪      |
-| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad      | ⚪      |
-| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`                | ⚪      |
+| F1   | Implementación (empaquetado, esqueleto, arnés, comprobador)          | 🟢      |
+| F2   | Pruebas unitarias del arnés, del comprobador y del esqueleto (`cli.main()` y `__main__` en proceso, este con `runpy`) para alcanzar el 90 % sobre `trelloctl` | 🟢 |
+| F3   | TCs automatizados de este milestone                                  | 🟢      |
+| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad      | 🟢      |
+| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`                | ⚪ (local only: PR and CI pending user confirmation)      |
 
 ## Casos de prueba automatizados
 
@@ -82,3 +82,5 @@ La común del [[00-plan-maestro#Definición de terminado común]], más: CI en v
 
 | Fecha | Evento |
 | ----- | ------ |
+| 2026-11-09 | F1-F4 completadas en local: empaquetado, esqueleto, Trello falso (núcleo), guardia de red, aislamiento, reloj, comprobador de trazabilidad; 13/13 TCs automatizados y verificados uno a uno; cobertura 100 % sobre `trelloctl` |
+| 2026-11-09 | Las seis comprobaciones locales en verde (sync, ruff check, ruff format, mypy, pytest con cobertura, trazabilidad). F5 pendiente: solo local, PR y CI a la espera de confirmación del usuario |
