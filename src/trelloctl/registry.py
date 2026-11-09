@@ -312,7 +312,232 @@ def _config() -> list[Operation]:
 
 
 # ==== BEGIN block: card ====
-# M09, M10 and M11 add the `card` operations here.
+@block("card")
+def _card() -> list[Operation]:
+    from trelloctl.app.commands import card as cmd
+
+    card_ref = Param(
+        "card",
+        "id, shortLink, URL, number or name",
+        positional=True,
+        required=True,
+        metavar="CARD",
+    )
+    desc_params = (
+        Param("desc", "description; - reads standard input (UTF-8)", exclusive="desc"),
+        Param(
+            "desc_file",
+            "read the description from a UTF-8 file",
+            metavar="PATH",
+            exclusive="desc",
+        ),
+    )
+    pos = Param("pos", "top, bottom or final index (0-based)", metavar="POS")
+    limit = Param("limit", "maximum cards (default 50; 0 = no limit)", ParamType.INT)
+    fields = Param("fields", "comma-separated fields to keep in each card", ParamType.CSV)
+    return [
+        Operation(
+            ("card", "create"),
+            "create a card at the end of a list",
+            'trelloctl card create --list "To Do" --name "Review PR 42" --labels bug,urgent',
+            cmd.create,
+            params=(
+                Param("list", "list id or name", required=True),
+                Param("name", "card name", required=True),
+                *desc_params,
+                Param("due", "due date, ISO-8601 (date alone: 12:00 UTC)", metavar="DATE"),
+                Param("labels", "labels: ids, names or name:color", ParamType.CSV),
+                Param("members", "members: ids, usernames or full names", ParamType.CSV),
+                pos,
+            ),
+            description=(
+                "Create the card at the end of the list, or at --pos, and print the complete "
+                "card. The description is sent as is (Markdown). Labels and members must "
+                "exist; otherwise nothing is created."
+            ),
+            need=Need.BOARD,
+        ),
+        Operation(
+            ("card", "get"),
+            "show a card; --full adds checklists, attachments and comments",
+            'trelloctl card get "Review PR 42" --full',
+            cmd.get,
+            params=(
+                card_ref,
+                Param(
+                    "full",
+                    "add checklists, attachments and comments",
+                    ParamType.BOOL,
+                    exclusive="detail",
+                ),
+                Param(
+                    "with",
+                    "add some of: checklists, attachments, comments",
+                    ParamType.CSV,
+                    metavar="PARTS",
+                    exclusive="detail",
+                ),
+            ),
+            description=(
+                "Show the card with its list, labels, members, due date, url, last activity and "
+                "badges. Checklists and attachments come from the cache; comments cost one "
+                "request. A card given by id or URL does not need a selected board."
+            ),
+            need=Need.CREDENTIALS,
+            cached_read=True,
+        ),
+        Operation(
+            ("card", "list"),
+            "list the open cards of the board, with optional filters",
+            'trelloctl card list --list "To Do" --label bug --not-done',
+            cmd.list_cards,
+            params=(
+                Param("list", "only cards of this list"),
+                Param("label", "only cards with this label"),
+                Param("member", "only cards of this member"),
+                Param("due_before", "only cards due before this moment", metavar="DATE"),
+                Param("due_after", "only cards due after this moment", metavar="DATE"),
+                Param("done", "only completed cards", ParamType.BOOL, exclusive="state"),
+                Param("not_done", "only cards not completed", ParamType.BOOL, exclusive="state"),
+                Param("include_archived", "also list archived cards", ParamType.BOOL),
+                limit,
+                fields,
+            ),
+            description=(
+                "Cards that satisfy every filter, in board order, from the cache. At most 50 "
+                "by default; meta.truncated tells whether more were left out."
+            ),
+            need=Need.BOARD,
+            cached_read=True,
+        ),
+        Operation(
+            ("card", "search"),
+            "search cards by name, description, checklists or comments",
+            'trelloctl card search "core-78*" --in name,desc,comments',
+            cmd.find,
+            params=(
+                Param("pattern", "text; * and ? are wildcards", positional=True, required=True),
+                Param(
+                    "in",
+                    "name, desc, checklists, comments",
+                    ParamType.CSV,
+                    metavar="FIELDS",
+                ),
+                Param("include_archived", "also search archived cards", ParamType.BOOL),
+                limit,
+                fields,
+            ),
+            description=(
+                "Case-insensitive search; --in defaults to name,desc. A pattern without "
+                "wildcards means *pattern*. Name, "
+                "description and checklists are searched in the cache; comments are searched "
+                "through Trello (one request) without wildcards, and meta.warnings says so."
+            ),
+            need=Need.BOARD,
+            cached_read=True,
+        ),
+        Operation(
+            ("card", "move"),
+            "move a card to a list, or N lists to the left or right",
+            'trelloctl card move "Review PR 42" --right 1 --dry-run',
+            cmd.move,
+            params=(
+                card_ref,
+                Param("to", "target list id or name", exclusive="target"),
+                Param("left", "N lists to the left (N >= 1)", ParamType.INT, exclusive="target"),
+                Param("right", "N lists to the right (N >= 1)", ParamType.INT, exclusive="target"),
+                pos,
+                Param("clamp", "stop at the first or last list", ParamType.BOOL),
+                Param("dry_run", "compute and report the move without writing", ParamType.BOOL),
+            ),
+            description=(
+                "With --left or --right the metadata is read fresh first and only open lists "
+                "count. The card goes to the end of the target list unless --pos is given."
+            ),
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "copy"),
+            "copy a card into a list",
+            'trelloctl card copy "Review PR 42" --to Done --keep checklists,labels',
+            cmd.copy,
+            params=(
+                card_ref,
+                Param("to", "target list id or name", required=True),
+                Param("name", "name of the copy (default: the same name)"),
+                pos,
+                Param(
+                    "keep",
+                    "all (default), none or a list of parts",
+                    ParamType.CSV,
+                    metavar="PARTS",
+                ),
+            ),
+            description=(
+                "Create the copy with idCardSource and print the new card. --keep takes all, "
+                "none or a list of: attachments, checklists, comments, due, labels, members, "
+                "stickers."
+            ),
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "update"),
+            "change fields of a card",
+            'trelloctl card update "Review PR 42" --due 2026-11-20 --labels bug',
+            cmd.update,
+            params=(
+                card_ref,
+                Param("name", "new name"),
+                *desc_params,
+                Param("due", "new due date, ISO-8601", metavar="DATE", exclusive="due"),
+                Param("no_due", "remove the due date", ParamType.BOOL, exclusive="due"),
+                Param("done", "mark as completed", ParamType.BOOL, exclusive="state"),
+                Param("not_done", "mark as not completed", ParamType.BOOL, exclusive="state"),
+                Param("labels", "replace the labels with these", ParamType.CSV),
+                Param("members", "replace the members with these", ParamType.CSV),
+                pos,
+            ),
+            description="Only the given fields change. --labels and --members replace the sets.",
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "done"),
+            "mark a card as completed",
+            'trelloctl card done "Review PR 42"',
+            cmd.done,
+            params=(card_ref,),
+            description="Set dueComplete; the card does not need a due date.",
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "undone"),
+            "mark a card as not completed",
+            'trelloctl card undone "Review PR 42"',
+            cmd.undone,
+            params=(card_ref,),
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "archive"),
+            "archive a card",
+            'trelloctl card archive "Review PR 42"',
+            cmd.archive,
+            params=(card_ref,),
+            description="Cards are never deleted; archive is reversible with card unarchive.",
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "unarchive"),
+            "restore an archived card to its list",
+            "trelloctl card unarchive 6b00000000000000000000c1",
+            cmd.unarchive,
+            params=(card_ref,),
+            description="Use the id, shortLink, URL or number; names skip archived cards.",
+            need=Need.CREDENTIALS,
+        ),
+    ]
+
+
 # ==== END block: card ====
 
 

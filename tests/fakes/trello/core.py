@@ -104,6 +104,11 @@ def _compile(template: str) -> re.Pattern[str]:
     return re.compile(f"^{regex}$")
 
 
+def _shape(template: str) -> str:
+    """A template with its parameter names erased, to tell whether two routes are the same."""
+    return re.sub(r"\{\w+\}", "{}", template)
+
+
 @dataclass
 class Route:
     method: str
@@ -126,7 +131,14 @@ class Router:
         self, method: str, template: str, auth: str = "query"
     ) -> Callable[[Handler], Handler]:
         def decorator(handler: Handler) -> Handler:
-            self.routes.append(Route(method.upper(), template, handler, auth))
+            route = Route(method.upper(), template, handler, auth)
+            shape = _shape(template)
+            for index, existing in enumerate(self.routes):
+                if existing.method == route.method and _shape(existing.template) == shape:
+                    self.routes[index] = route  # same method and path shape: override it
+                    break
+            else:
+                self.routes.append(route)
             return handler
 
         return decorator
