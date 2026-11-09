@@ -1,7 +1,7 @@
 ---
 id: M13
 title: Skill trelloctl — contenido, list, install y export
-status: pending
+status: in_review
 wave: 4
 depends_on: [M06]
 branch: feature/m13-skills
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M13 — Skill `trelloctl`: contenido, `list`, `install` y `export`
 
-**Estado:** ⚪ Pendiente · **Ola:** 4 · **Depende de:** M06 · **Rama:** `feature/m13-skills`
+**Estado:** 🔵 En revisión · **Ola:** 4 · **Depende de:** M06 · **Rama:** `feature/m13-skills`
 
 ## Objetivo
 
@@ -40,10 +40,10 @@ Instalación directa para harness distintos de Claude Code (PRD §12, decisión 
 
 | Fase | Descripción                                                     | Estado |
 | ---- | --------------------------------------------------------------- | ------ |
-| F1   | Implementación (incluida la redacción del skill)                | ⚪      |
-| F2   | Pruebas unitarias                                               | ⚪      |
-| F3   | TCs automatizados                                               | ⚪      |
-| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | ⚪      |
+| F1   | Implementación (incluida la redacción del skill)                | 🟢     |
+| F2   | Pruebas unitarias                                               | 🟢     |
+| F3   | TCs automatizados                                               | 🟢     |
+| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | 🟢     |
 | F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪      |
 
 ## Casos de prueba automatizados
@@ -74,3 +74,5 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 
 | Fecha | Evento |
 | ----- | ------ |
+| 2026-11-09 | F1-F4 completadas: SKILL.md, `skills list|install|export`, 15 TCs automatizados, seis puertas locales en verde. F5 pendiente: local only, PR and CI pending user confirmation |
+| 2026-11-09 | F4: `uv sync --all-extras`, `ruff check`, `ruff format --check`, `mypy`, `pytest` (309 passed, 1 skipped, cobertura 98.85 %), `check_traceability.py` en verde |
