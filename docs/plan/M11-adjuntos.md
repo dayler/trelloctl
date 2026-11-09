@@ -84,5 +84,5 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 | ----- | ------ |
 | 2026-11-09 | F1-F3: `app/commands/attachments.py`, bloque `card attachments` de `registry.py`, rutas `GET /cards/{id}/attachments` y alta con `date`/`mimeType`/`url` en el Trello falso; 21 TCs automatizados (nivel E) y verificados uno a uno; pruebas unitarias del módulo. |
 | 2026-11-09 | Decisiones: `download --all` y `--id` hacen una lectura `GET /cards/{id}` antes de descargar; "cambiado" se decide comparando bytes y fecha de la fila cacheada previa con la recién leída, más tamaño del archivo local; `add` refresca la tarjeta (una lectura extra) para meter el adjunto en caché porque `infra/cache.py` no ofrece alta individual; `clear` localiza la tarjeta solo en el caché (sin API). |
-| 2026-11-09 | F4: ruff check, ruff format --check, mypy, pytest con cobertura y `check_traceability.py` en verde (ver informe). F5 sigue ⚪: solo local, PR y CI pendientes de confirmación del usuario. |
+| 2026-11-09 | F4: ruff check, ruff format --check, mypy, pytest con cobertura y `check_traceability.py` en verde (ver informe). |
 | 2026-11-09 | F5: PR #12 fusionado en `develop` con merge commit, CI en verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14. Estado: `done`. |

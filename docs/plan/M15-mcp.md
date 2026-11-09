@@ -79,6 +79,6 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 
 | Fecha | Evento |
 | ----- | ------ |
-| 2026-11-09 | Implementación (`mcp_server.py`, entrada `mcp serve`, extra `mcp>=2.3,<2.4`), 19 TCs automatizados y documentación MCP en README y SKILL.md. F5 pendiente: solo local, PR y CI pendientes de confirmación del usuario. |
+| 2026-11-09 | Implementación (`mcp_server.py`, entrada `mcp serve`, extra `mcp>=2.3,<2.4`), 19 TCs automatizados y documentación MCP en README y SKILL.md. |
 | 2026-11-09 | F4 local: ruff check, ruff format --check y mypy sin errores; pytest 906 pasados, 1 omitido, cobertura 98,46 %; trazabilidad OK. Nota: `--help` general (cli.py, fuera de alcance) dice «experimental» pero no nombra el extra; el extra figura en `mcp serve --help`, README y SKILL.md. |
 | 2026-11-09 | F5: PR #16 fusionado en `develop` con merge commit, CI en verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14. Estado: `done`. |
