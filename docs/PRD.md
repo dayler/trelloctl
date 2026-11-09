@@ -1,7 +1,7 @@
 ---
 title: trelloctl — PRD
 status: approved
-version: 1.0.0
+version: 1.1.0
 date: 2026-11-09
 tags: [prd, trelloctl, trello, cli]
 ---
@@ -14,7 +14,7 @@ tags: [prd, trelloctl, trello, cli]
 | ----------- | -------------------------------------------------------- |
 | Autor       | Ariel Salazar Hinojosa                                   |
 | Estado      | Aprobado                                                 |
-| Versión     | 1.0.0                                                    |
+| Versión     | 1.1.0 (historial en §13)                                 |
 | Fecha       | 2026-11-09                                               |
 | Revisores   | Ariel Salazar Hinojosa                                   |
 | Repositorio | `trelloctl`                                              |
@@ -99,13 +99,13 @@ Criterios de aceptación:
 
 - AC‑1.1 El directorio de trabajo es `~/.trelloctl` (en Windows, `%USERPROFILE%\.trelloctl`). La variable de entorno `TRELLOCTL_HOME` lo sobrescribe.
 - AC‑1.2 El archivo de configuración es `<HOME>/config.toml`, con el contenido de §10.5. Si no existe, cualquier comando que hable con Trello falla con `CONFIG_NOT_FOUND`. No lo necesitan `--help`, `--version`, `version`, `doctor`, `config init`, `config show` ni `skills *`. `config board set|unset` y `config validate` exigen el archivo (`CONFIG_NOT_FOUND` si falta); `config board set` con un nombre exige además credenciales (`AUTH_MISSING`).
-- AC‑1.3 `config init` crea el directorio y un `config.toml` con todos los campos documentados y valores por defecto, sin sobrescribir uno existente salvo `--force`. Indica cómo obtener las credenciales: la API key en `https://trello.com/power-ups/admin` (Power‑Up → Trello Auth → "Generate a new API Key") y el token en `https://trello.com/1/authorize?expiration=never&scope=read,write&response_type=token&key=<key>`.
+- AC‑1.3 `config init` crea el directorio y un `config.toml` con la configuración mínima (solo `[auth]` activo, con `api_key` y `token` vacíos) seguida, comentadas, de todas las demás secciones y claves con su valor por defecto y su explicación; como una clave ausente toma su valor por defecto, la configuración efectiva es la misma que con la plantilla completa de §10.5. No sobrescribe uno existente salvo `--force`. Indica cómo obtener las credenciales: la API key en `https://trello.com/power-ups/admin` (Power‑Up → Trello Auth → "Generate a new API Key") y el token en `https://trello.com/1/authorize?expiration=never&scope=read,write&response_type=token&key=<key>`.
 - AC‑1.4 Precedencia: flags > variables de entorno > `config.toml` > valores por defecto. Variables reconocidas: `TRELLOCTL_HOME`, `TRELLO_API_KEY`, `TRELLO_TOKEN`, `TRELLO_BOARD`.
 - AC‑1.5 Sin `api_key` o `token` en archivo ni entorno, cualquier comando que hable con Trello falla con `AUTH_MISSING`. Si Trello rechaza las credenciales (401 con `invalid key` o `invalid token`, o 401 en `GET /members/me`), `AUTH_INVALID` sin reintento. Un 401 o 403 sobre un recurso concreto con credenciales válidas se traduce según AC‑23.3 (`API_ERROR`) o, si el recurso es un tablero, `BOARD_NOT_FOUND`.
 - AC‑1.6 `config show` imprime la configuración efectiva en JSON con el token enmascarado. `config validate` valida tipos, campos obligatorios y acceso al tablero por defecto, si lo hay, y reporta cada problema con su clave TOML.
 - AC‑1.7 Un archivo TOML malformado produce `CONFIG_INVALID` con línea y columna cuando el parser las proporciona.
-- AC‑1.8 `config.toml` guarda un único tablero por defecto en `[board].default` (id o shortLink). Cada invocación opera sobre un solo tablero: el de `--board`, si no el de `TRELLO_BOARD`, si no el por defecto; sin ninguno de los tres, `BOARD_NOT_CONFIGURED`.
-- AC‑1.9 `--board` y `TRELLO_BOARD` aceptan id (24 hexadecimales), shortLink (8 alfanuméricos), URL de Trello (`https://trello.com/b/<shortLink>/...`) o nombre, resueltos en ese orden. El nombre se resuelve contra la lista de tableros del usuario (`GET /members/me/boards`) cacheada con el TTL de metadatos; si coincide con varios, `AMBIGUOUS_BOARD`.
+- AC‑1.8 `config.toml` guarda un único tablero por defecto en `[board].default` (id o shortLink). Cada invocación opera sobre un solo tablero: el de `--board`, si no el de `TRELLO_BOARD`, si no el por defecto; sin ninguno de los tres, `BOARD_NOT_CONFIGURED`. Una excepción: un comando `card` que recibe la tarjeta por id (24 hexadecimales) o URL de Trello la localiza sin tablero seleccionado, y el contexto (listas, etiquetas, miembros y caché) es el tablero de la tarjeta (AC‑22.9 y AC‑28.7).
+- AC‑1.9 `--board` y `TRELLO_BOARD` aceptan id (24 hexadecimales), shortLink (8 alfanuméricos), URL de Trello (`https://trello.com/b/<shortLink>/...`) o nombre, resueltos así: un id de 24 hexadecimales y una URL se resuelven directamente; un valor de 8 alfanuméricos se busca primero por nombre y, si ninguno coincide, como shortLink, ambos contra la lista de tableros del usuario (`GET /members/me/boards`) cacheada con el TTL de metadatos y sin llamadas extra; cualquier otro valor se trata como nombre. La recarga y el reintento de AC‑22.12 aplican a ambos. Si un nombre coincide con varios tableros, `AMBIGUOUS_BOARD`. Por defecto la resolución por nombre solo considera los tableros activos (no archivados en Trello), estén o no en `config.toml`; la opción global `--include-archived-boards` (en MCP, el parámetro opcional `include_archived_boards`) incluye también los archivados y, con ella, un nombre repetido entre un tablero activo y uno archivado da `AMBIGUOUS_BOARD`. Por id, shortLink o URL un tablero archivado se alcanza siempre.
 - AC‑1.10 `config board show` muestra el tablero por defecto (id, nombre, url) o indica que no hay. `config board set <tablero>` resuelve `<tablero>` según AC‑1.9 y guarda su id; `config board unset` lo elimina. El escritor reescribe solo la sección `[board]`, conserva el resto del archivo línea a línea y deja una copia `config.toml.bak` antes de escribir.
 - AC‑1.11 `logging.level` fija el nivel por defecto de RF‑24. `http.*` parametriza RF‑23. `cache.*` fija los TTL de RF‑22; el caché no se puede desactivar por configuración, solo por invocación con `--no-cache`.
 - AC‑1.12 Todas las claves salvo `[auth]` son opcionales: una clave ausente toma el valor por defecto de la plantilla de §10.5. Un `config.toml` con solo `[auth]` es válido (configuración mínima en §10.5).
@@ -141,7 +141,7 @@ Criterios de aceptación:
 Criterios de aceptación:
 
 - AC‑5.1 `doctor` imprime un informe legible por humanos; `doctor --json` devuelve el mismo informe en JSON.
-- AC‑5.2 Comprueba, en orden: versión del intérprete; existencia, permisos y escritura en el directorio de trabajo, `logs/` y `attachments/`; parseo de `config.toml`; presencia de credenciales; resolución DNS y conectividad TLS con `api.trello.com`; validez del token; acceso al tablero por defecto, si lo hay; integridad (`PRAGMA integrity_check`) y versión de esquema de `cache.db`; extra MCP instalado (paquete `mcp` localizable con `importlib.util.find_spec`) y su versión; versión del skill instalado en el harness (ámbitos `user` y `project`) frente a la empaquetada; disponibilidad del Inbox (AC‑28.5).
+- AC‑5.2 Comprueba, en orden: versión del intérprete; existencia, permisos y escritura en el directorio de trabajo, `logs/` y `attachments/`; parseo de `config.toml`; presencia de credenciales; resolución DNS y conectividad TLS con el host de `http.base_url` (por defecto `api.trello.com`; si `base_url` no es HTTPS, la comprobación TLS es `WARN` «not applicable», y el mensaje de fallo TLS incluye siempre la sugerencia sobre los certificados de macOS); validez del token; acceso al tablero por defecto, si lo hay; integridad (`PRAGMA integrity_check`) y versión de esquema de `cache.db`; extra MCP instalado (paquete `mcp` localizable con `importlib.util.find_spec`) y su versión; versión del skill instalado en el harness (ámbitos `user` y `project`) frente a la empaquetada; disponibilidad del Inbox (AC‑28.5).
 - AC‑5.3 Cada comprobación muestra `OK`, `WARN` o `FAIL` con una línea de explicación y, en caso de fallo, la acción sugerida.
 - AC‑5.4 Código de salida 0 si no hay `FAIL`, 1 si hay alguno.
 - AC‑5.5 `doctor --api` descarga la especificación OpenAPI que publica Trello (`swagger.v3.json` en `developer.atlassian.com/cloud/trello/`, verificada el 2026-11-09) y comprueba que cada endpoint, método y parámetro que usa la herramienta sigue existiendo: `WARN` para parámetros marcados obsoletos, `FAIL` para endpoints ausentes. Si la especificación no está disponible lo reporta como `WARN`. Después ejecuta una lectura de humo por cada endpoint de lectura contra el tablero por defecto.
@@ -161,7 +161,7 @@ Criterios de aceptación:
 
 - AC‑7.1 Tablero: id, shortLink, URL o nombre (AC‑1.9).
 - AC‑7.2 Lista: id o nombre. Etiqueta: id, nombre o `nombre:color`. Miembro: id o username. Checklist: id o nombre dentro de la tarjeta. Ítem: id o nombre dentro del checklist. Comentario: solo id (el `idAction` de Trello).
-- AC‑7.3 Tarjeta: id (24 hexadecimales), shortLink (8 alfanuméricos), URL de Trello, número corto (`idShort`, valor compuesto solo por dígitos) o nombre. Un valor solo de dígitos se interpreta siempre como `idShort`; una tarjeta con nombre numérico se localiza con `card search`.
+- AC‑7.3 Tarjeta: id (24 hexadecimales), shortLink (8 alfanuméricos), URL de Trello, número corto (`idShort`, valor compuesto solo por dígitos) o nombre. Un valor solo de dígitos se interpreta siempre como `idShort`; una tarjeta con nombre numérico se localiza con `card search`. Un valor de 8 alfanuméricos se busca primero por nombre y, si no hay coincidencia, por shortLink, ambos contra el caché de tarjetas y sin llamadas extra; la recarga y el reintento de AC‑22.12 aplican a ambos, y un id de 24 hexadecimales o una URL no cambian. Un id o una URL se localizan sin tablero seleccionado (AC‑1.8); un shortLink suelto, un `idShort` y un nombre exigen tablero seleccionado, porque se buscan en su caché.
 - AC‑7.4 Si un nombre coincide con varias entidades se devuelve `AMBIGUOUS_<ENTIDAD>` con los candidatos (id, nombre y contexto: lista para tarjetas, color para etiquetas) en `details.candidates`, y no se ejecuta la operación.
 - AC‑7.5 Un identificador no resuelto produce `<ENTIDAD>_NOT_FOUND` con el valor recibido, tras el reintento de AC‑22.12.
 
@@ -217,7 +217,7 @@ Criterios de aceptación:
 
 - AC‑13.1 `card get <tarjeta>` devuelve la tarjeta con lista, etiquetas, miembros, due, `dueComplete`, url, fecha de última actividad y los contadores de `badges`. `--full` añade checklists con sus ítems, adjuntos y comentarios; `--with comments,checklists,attachments` elige un subconjunto. Checklists y adjuntos salen del caché; los comentarios cuestan una llamada.
 - AC‑13.2 `card list [--list <lista>] [--label <etiqueta>] [--member <m>] [--due-before <ISO‑8601>] [--due-after <ISO‑8601>] [--done | --not-done]` devuelve las tarjetas abiertas que cumplen todos los filtros, desde el caché; sin filtros, todas las del tablero.
-- AC‑13.3 `card search <patrón> [--in name,desc,checklists,comments]` busca tarjetas; por defecto en `name` y `desc`. El patrón admite `*` (cualquier secuencia) y `?` (un carácter), sin distinción de mayúsculas; sin comodines equivale a `*patrón*`. `name`, `desc` y `checklists` se resuelven en el caché con `lower(campo) GLOB lower(patrón)` sin llamadas. `comments` se delega a `GET /search` de Trello con el operador `comment:` restringido al tablero y `partial=true`: una llamada, búsqueda por palabra; los comodines `*` y `?` se eliminan del patrón antes de enviarlo y `meta.warnings` lo indica. Cada resultado indica en qué campos coincidió (`matched`) y, para comentarios, el id del comentario.
+- AC‑13.3 `card search <patrón> [--in name,desc,checklists,comments]` busca tarjetas; por defecto en `name` y `desc`. El patrón admite `*` (cualquier secuencia), `?` (un carácter) y las clases `[...]` de GLOB, sin distinción de mayúsculas; sin comodines equivale a `*patrón*`. `name`, `desc` y `checklists` se resuelven en el caché con `lower(campo) GLOB lower(patrón)` sin llamadas, incluidas las clases `[...]`. `comments` se delega a `GET /search` de Trello con el operador `comment:` restringido al tablero y `partial=true`: una llamada, búsqueda por palabra; los caracteres `*`, `?`, `[` y `]` se eliminan del patrón antes de enviarlo, porque el API no los admite, y `meta.warnings` lo indica. Cada resultado indica en qué campos coincidió (`matched`) y, para comentarios, el id del comentario.
 - AC‑13.4 `card list`, `card search`, `card comments`, `board activity` e `inbox list` devuelven como máximo 50 elementos por defecto; `--limit N` lo cambia y `--limit 0` lo elimina (paginando contra Trello donde aplique). `meta.truncated = true` indica que quedaron resultados fuera. `--fields a,b,c` acota los campos de cada elemento en esos mismos listados. El resto de listados (listas, etiquetas, miembros, checklists, adjuntos) devuelve siempre el conjunto completo.
 - AC‑13.5 `card list` y `card search` excluyen las tarjetas archivadas; `--include-archived` las incluye con su marca `archived`, recargando antes el snapshot de archivadas si no existe o venció (AC‑22.6).
 - AC‑13.6 Toda lectura servida desde el caché acepta `--fresh`, que ignora el TTL en esa invocación, lee de Trello y actualiza el caché.
@@ -320,7 +320,7 @@ Criterios de aceptación:
 - AC‑22.11 Las escrituras no comprueban TTL: usan ids y actualizan el caché con lo que devuelve Trello (write‑through), poniendo `fetched_at` al momento de la respuesta. Excepción: `card move --left/--right` y `board list move` traen primero los metadatos frescos con la llamada completa de AC‑22.6.
 - AC‑22.12 Resolución de nombre que falla contra caché: recarga de la colección correspondiente (metadatos, tableros del usuario o snapshot de tarjetas) y un reintento; si vuelve a fallar, `<ENTIDAD>_NOT_FOUND`.
 - AC‑22.13 Referencias rancias: si Trello responde 404 o id inválido sobre un id obtenido al resolver un nombre, se recarga la colección, se vuelve a resolver y se reintenta una vez. Si el id lo pasó el usuario, se confirma con una lectura, se marca `cards.deleted` si es una tarjeta y se devuelve `<ENTIDAD>_NOT_FOUND` sin reintentar.
-- AC‑22.14 Al recargar metadatos, las tarjetas cuya lista ya no existe se marcan rancias. Una tarjeta que al refrescarse llega con `closed = true` pasa a `archived`.
+- AC‑22.14 Al recargar metadatos, las tarjetas cuya lista ya no existe se eliminan del caché; si un comando las necesita después, se piden a demanda (`GET /cards/{id}`) y vuelven al caché con su lista real. Una tarjeta que al refrescarse llega con `closed = true` pasa a `archived`.
 - AC‑22.15 `cache status` devuelve, por tablero, la antigüedad y tamaño de cada snapshot y el espacio ocupado por adjuntos. `cache clear` vacía `cache.db` sin tocar los adjuntos descargados (`--attachments` los borra también, AC‑21.6).
 
 ### RF‑23 Robustez frente al API (M)
@@ -346,7 +346,7 @@ Criterios de aceptación:
 
 Criterios de aceptación:
 
-- AC‑25.1 `mcp serve` inicia un servidor MCP sobre stdio. Las herramientas se generan del mismo registro de operaciones que los subcomandos de la CLI, con el nombre del comando en `snake_case` y el parámetro opcional `board` con la semántica de `--board`. Se exponen todas las operaciones de tablero, tarjeta e Inbox (RF‑8 a RF‑21 y RF‑28) más `cache_reload` y `cache_status`; quedan fuera `config *`, `doctor`, `version`, `skills *`, `cache clear` y `card attachments clear`.
+- AC‑25.1 `mcp serve` inicia un servidor MCP sobre stdio. Las herramientas se generan del mismo registro de operaciones que los subcomandos de la CLI, con el nombre del comando en `snake_case` y los parámetros opcionales `board`, con la semántica de `--board`, e `include_archived_boards`, con la de `--include-archived-boards`. Se exponen todas las operaciones de tablero, tarjeta e Inbox (RF‑8 a RF‑21 y RF‑28) más `cache_reload` y `cache_status`; quedan fuera `config *`, `doctor`, `version`, `skills *`, `cache clear` y `card attachments clear`.
 - AC‑25.2 El resultado de cada herramienta es el envelope JSON del comando equivalente, compacto, como contenido de texto; `isError: true` cuando `ok` es falso. Las operaciones que en la CLI exigen `--yes` exigen `yes: true`.
 - AC‑25.3 El servidor no escribe nada en stdout que no sea protocolo; los logs van al archivo y a stderr.
 - AC‑25.4 Se instala como extra `trelloctl[mcp]`; la instalación base no lo requiere y `--help`, el README y el skill lo documentan como experimental.
@@ -395,7 +395,7 @@ Criterios de aceptación:
 | RNF‑7 | Todas las fechas en salida en ISO‑8601 UTC.                                                                                   |
 | RNF‑8 | Sin telemetría. Únicos destinos de red: `http.base_url` (por defecto `api.trello.com`) y, solo para `doctor --api`, `developer.atlassian.com`. |
 | RNF‑9 | Licencia MIT; dependencias de desarrollo con licencias compatibles.                                                           |
-| RNF‑10 | Idioma: todo texto que la herramienta emite o instala (ayuda, `doctor`, mensajes de error, logs, plantilla de `config.toml`, `SKILL.md`, README) está en inglés. La única excepción es `docs/`. |
+| RNF‑10 | Idioma: todo texto que la herramienta emite o instala (ayuda, `doctor`, mensajes de error, logs, plantilla de `config.toml`, `SKILL.md`) está en inglés. Las excepciones son `docs/` y `README.md`, que están en español (los nombres de comandos, opciones y códigos de error no se traducen); el README queda fuera de la comprobación de idioma. |
 
 ## 9. Fuera de alcance
 
@@ -537,6 +537,7 @@ trelloctl [opciones globales] <grupo> <comando> [argumentos]
 
 Opciones globales:
   --board <id|shortLink|url|nombre>   tablero (sobrescribe TRELLO_BOARD y el tablero por defecto)
+  --include-archived-boards           incluye los tableros archivados al resolver un nombre de tablero
   --compact             JSON en una sola línea (por defecto va indentado)
   --no-cache            no lee ni escribe cache.db
   --log-level <nivel>   debug|info|warning|error
@@ -675,7 +676,7 @@ Error:
 
 #### Archivo de configuración
 
-Plantilla completa, la que escribe `config init`:
+Plantilla completa: referencia de todas las claves y de sus valores por defecto. `config init` escribe la configuración mínima de AC‑1.12 con solo `[auth]` activo y, a continuación, todo lo demás de esta plantilla comentado, cada clave con su valor por defecto y su explicación en inglés; `config board set` añade una sección `[board]` activa al final del archivo y conserva el bloque comentado. La configuración efectiva es la misma que con esta plantilla completa:
 
 ```toml
 # ~/.trelloctl/config.toml
@@ -822,7 +823,7 @@ Esquema de `cache.db`:
 | `checklists`    | `board_id`, `card_id`, `id`      | `name`, `pos`                                                                                                                                                                                                                                                           | listado y resolución de checklists                                        |
 | `checkitems`    | `board_id`, `checklist_id`, `id` | `name`, `state`, `pos`                                                                                                                                                                                                                                                  | ítems, progreso y resolución por nombre                                   |
 
-Reglas de frescura adicionales a RF‑22: `member_boards.fetched_at` sigue el TTL de metadatos y solo se consulta cuando `--board`, `TRELLO_BOARD` o `config board set` traen un nombre; `boards.archived_fetched_at` sigue el TTL de tarjetas y solo se evalúa con `--include-archived`; `cards.deleted` marca ids que Trello confirmó inexistentes para no volver a consultarlos; los adjuntos no caducan y `local_path` es nulo hasta que se descargan. La recarga completa reemplaza las filas del `board_id` en una única transacción.
+Reglas de frescura adicionales a RF‑22: `member_boards.fetched_at` sigue el TTL de metadatos y solo se consulta cuando `--board`, `TRELLO_BOARD` o `config board set` traen un nombre o un valor de 8 alfanuméricos, y la resolución por nombre excluye las filas con `closed` verdadero salvo con `--include-archived-boards`; si un tablero se borra o se pierde el acceso, `BOARD_NOT_FOUND` es el resultado correcto y sus filas permanecen en `cache.db` (no se sirven nunca y `cache status` las sigue contando) hasta un `cache clear`, sin purga automática; `boards.archived_fetched_at` sigue el TTL de tarjetas y solo se evalúa con `--include-archived`; `cards.deleted` marca ids que Trello confirmó inexistentes para no volver a consultarlos; los adjuntos no caducan y `local_path` es nulo hasta que se descargan. La recarga completa reemplaza las filas del `board_id` en una única transacción.
 
 Contenido del directorio de trabajo:
 
@@ -1007,7 +1008,7 @@ Para depurar sin harness, se lanza `trelloctl mcp serve` en una terminal y se le
 
 ## 12. Preguntas abiertas
 
-Sin preguntas abiertas a 2026-11-09. Decisiones tomadas sobre las que hubo:
+Sin preguntas abiertas a 2026-11-09. Decisiones tomadas sobre las que hubo (las números 15 y 16 son de la v1.1):
 
 | #   | Pregunta                                                                 | Decisión                                                                                                                       |
 | --- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
@@ -1023,5 +1024,26 @@ Sin preguntas abiertas a 2026-11-09. Decisiones tomadas sobre las que hubo:
 | 10  | ¿Cómo tratar las tarjetas que entran por correo o Slack al Inbox personal? | Redirigir esas entradas al tablero con email‑to‑board y la app de Slack; además, `inbox list/add/move` para leer y vaciar el Inbox (RF‑28). |
 | 11  | ¿El plan gratuito limita el API?                                         | No: mismo rate limit que los planes de pago; sus restricciones (10 tableros por workspace, 10 MB por adjunto) no afectan a la herramienta salvo `attachments.max_upload_bytes` (AC‑21.5). |
 | 12  | ¿Varios tableros por invocación?                                         | No: uno por invocación (`--board`, `TRELLO_BOARD` o el por defecto); varios tableros son varias invocaciones (AC‑1.8). |
-| 13  | ¿Idioma de los textos que emite o instala la herramienta?               | Inglés en ayuda, `doctor`, errores, logs, plantilla de `config.toml`, `SKILL.md` y README; `docs/` en español (RNF‑10). |
+| 13  | ¿Idioma de los textos que emite o instala la herramienta?               | Inglés en ayuda, `doctor`, errores, logs, plantilla de `config.toml` y `SKILL.md`; `docs/` y `README.md` en español (RNF‑10). |
 | 14  | ¿Se mantiene `http.base_url` en `config.toml`?                           | Sí, con valor por defecto `https://api.trello.com/1` y solo para entornos de prueba (AC‑23.6); toda clave salvo `[auth]` es opcional (AC‑1.12). |
+| 15  | ¿Se depreca el shortLink como identificador de tableros y tarjetas? | No en v1.1: sigue siendo válido, pero un valor de 8 alfanuméricos se busca primero por nombre y después por shortLink (AC‑1.9, AC‑7.3). Un harness usa ids y una persona usa nombres; la deprecación se reconsiderará en una versión futura. |
+| 16  | ¿Se purga del caché un tablero borrado o inaccesible? | No: `BOARD_NOT_FOUND` es el resultado correcto, sus filas no se sirven nunca y se eliminan con `cache clear` (§10.6). |
+
+## 13. Historial de cambios
+
+| Versión | Fecha      | Cambios                                                                                  |
+| ------- | ---------- | ---------------------------------------------------------------------------------------- |
+| 1.0.0   | 2026-11-09 | Versión aprobada.                                                                        |
+| 1.1.0   | 2026-11-09 | Concilia el PRD con las aclaraciones del plan de implementación y con las decisiones tomadas tras implementarlo. No añade ni elimina requisitos: los identificadores de RF, AC y RNF no cambian. |
+
+Cambios de la v1.1.0, por sección:
+
+- **AC‑1.3, §10.5 (archivo de configuración).** `config init` escribe la configuración mínima con solo `[auth]` activo y el resto de la plantilla comentado con sus valores por defecto; `config board set` añade `[board]` al final y conserva el bloque comentado.
+- **AC‑1.8, AC‑7.3.** Un comando `card` con una tarjeta dada por id o URL no exige tablero seleccionado; el shortLink suelto, el `idShort` y el nombre sí.
+- **AC‑1.9, AC‑7.3, §10.6.** Un valor de 8 alfanuméricos se busca primero por nombre y luego por shortLink contra el caché, sin llamadas extra. El shortLink sigue siendo válido (decisión 15, §12).
+- **AC‑1.9, AC‑25.1, §10.5 (opciones globales).** Opción global `--include-archived-boards` y parámetro MCP `include_archived_boards`; por defecto la resolución por nombre excluye los tableros archivados en Trello.
+- **AC‑5.2.** Las comprobaciones de DNS y TLS de `doctor` apuntan al host de `http.base_url`.
+- **AC‑13.3.** La búsqueda local admite las clases `[...]` de GLOB; en comentarios se eliminan con aviso.
+- **AC‑22.14.** Las tarjetas de una lista desaparecida se eliminan del caché y se piden a demanda.
+- **§10.6.** Un tablero borrado o inaccesible no se purga del caché; se limpia con `cache clear` (decisión 16, §12).
+- **RNF‑10 y decisión 13 (§12).** `README.md` está en español, junto con `docs/`.

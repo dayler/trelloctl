@@ -3,13 +3,13 @@ title: trelloctl — Plan maestro de implementación
 status: pending
 version: 1.0.0
 date: 2026-11-09
-source: docs/PRD.md (v1.0.0, cerrado)
+source: docs/PRD.md (v1.1.0, cerrado)
 tags: [plan, trelloctl]
 ---
 
 # trelloctl — Plan maestro de implementación
 
-Este documento coordina y monitoriza la implementación del [[PRD]] v1.0.0 en 17 milestones (M00 a M16). Cada milestone tiene su propio plan en esta carpeta y está pensado para ejecutarse en un subagente aislado, en su propia rama y worktree. El PRD está cerrado y no se modifica; las interpretaciones necesarias para implementarlo están en [[#Aclaraciones de comportamiento]]. Este plan no contiene código: describe qué se construye, en qué orden, con qué pruebas y cómo se da por terminado.
+Este documento coordina y monitoriza la implementación del [[PRD]] (v1.0.0; la v1.1.0 incorpora las aclaraciones, ver [[#Conciliación con el PRD]]) en 17 milestones (M00 a M16). Cada milestone tiene su propio plan en esta carpeta y está pensado para ejecutarse en un subagente aislado, en su propia rama y worktree. El PRD está cerrado y no se modifica; las interpretaciones necesarias para implementarlo están en [[#Aclaraciones de comportamiento]]. Este plan no contiene código: describe qué se construye, en qué orden, con qué pruebas y cómo se da por terminado.
 
 Documentos relacionados: [[01-estrategia-de-pruebas]] · [[tc-manuales-trello]] · `CLAUDE.md` en la raíz del repositorio.
 
@@ -167,7 +167,7 @@ Puntos que el PRD no fija o que necesitan una regla única para escribir los TCs
 | A-11 | decidida  | Archivo de entrada inexistente         | `--desc-file`, `--text-file`, `--items-file` o `--file` inexistente o ilegible: `USAGE`.                                                                                                                                   | AC-12.4, AC-21.5      |
 | A-12 | decidida  | Comprobaciones de `doctor` no aplicables | Sin tablero por defecto: `WARN`. Extra MCP ausente: `OK` con "not installed (optional)". Skill no instalado o con versión distinta: `WARN`.                                                                             | AC-5.2                |
 | A-13 | decidida  | Texto enriquecido en descripción y comentarios | El texto de `--desc`, `--desc-file`, `--desc -`, `--text`, `--text-file` y `--text -` se envía a Trello tal cual, sin conversión ni validación: Trello lo almacena e interpreta como Markdown (negritas, listas, enlaces, encabezados, código) y las menciones `@username`. HTML no se convierte ni se escapa. Aplica a `card create`, `card update`, `inbox add`, `card comment add` y `card comment edit`. `card get` y `card comments` devuelven el Markdown original. | AC-12.3, AC-12.4, AC-17.2, AC-17.3, AC-28.3 |
-| A-14 | decidida | Valores de 8 caracteres alfanuméricos | Para tableros y tarjetas, un valor de 8 caracteres alfanuméricos se busca primero por nombre y, si no hay coincidencia, por shortLink, contra el caché (`member_boards` o `cards`) y sin llamadas extra; la recarga y el reintento de AC-22.12 aplican a ambos. Ids de 24 hexadecimales, URLs e `idShort` no cambian. Prevalece sobre el orden de AC-1.9 y AC-7.3 (ver [[#Notas para versiones futuras]]). | AC-1.9, AC-7.3 |
+| A-14 | decidida | Valores de 8 caracteres alfanuméricos | Para tableros y tarjetas, un valor de 8 caracteres alfanuméricos se busca primero por nombre y, si no hay coincidencia, por shortLink, contra el caché (`member_boards` o `cards`) y sin llamadas extra; la recarga y el reintento de AC-22.12 aplican a ambos. Ids de 24 hexadecimales, URLs e `idShort` no cambian. Prevalece sobre el orden de AC-1.9 y AC-7.3 (ver [[#Conciliación con el PRD]]). | AC-1.9, AC-7.3 |
 | A-15 | decidida | Tarjetas sin tablero seleccionado | Los comandos `card` con una tarjeta dada por id o URL la localizan sin tablero seleccionado (`GET /cards/{id}` o `GET /cards/{shortLink}` de la URL); el contexto (listas, etiquetas, miembros y caché) es el tablero de la tarjeta, incluido el Inbox. shortLink suelto, `idShort` y nombre exigen tablero seleccionado (`BOARD_NOT_CONFIGURED`), porque se buscan en su caché (A-14). La localización vive en `app/resolver.py` (M07) y la reutilizan todos los comandos `card`. | AC-28.7, AC-22.9, AC-1.8 |
 | A-16 | decidida | `config validate` y claves desconocidas | Con problemas, `config validate` devuelve `CONFIG_INVALID`, salida 3, con `details.problems` (clave TOML y motivo), incluido `board.default` inaccesible. Una clave TOML desconocida se ignora y solo genera un aviso en `meta.warnings`; ningún comando falla por ella, tampoco `config validate`. | AC-1.6, AC-1.7 |
 | A-17 | decidida | Tarjetas de una lista desaparecida | Al recargar metadatos, las tarjetas cuya lista ya no existe se eliminan del caché. Si un comando las necesita después, se piden al API a demanda (`GET /cards/{id}`) y vuelven al caché con su lista real. | AC-22.14 |
@@ -180,27 +180,26 @@ Puntos que el PRD no fija o que necesitan una regla única para escribir los TCs
 | A-24 | decidida | Tableros archivados en la resolución por nombre | Por defecto, la resolución por nombre de `--board`, `TRELLO_BOARD` y `config board set` solo considera tableros activos (no archivados en Trello, `closed = false`), estén o no en `config.toml`. La opción global `--include-archived-boards` (en MCP, el parámetro opcional `include_archived_boards` junto a `board`) incluye también los archivados; con ella, un nombre repetido entre un tablero activo y uno archivado da `AMBIGUOUS_BOARD`. Por id, shortLink o URL un tablero archivado se alcanza siempre. Amplía el contrato de la CLI de §10.5. | AC-1.9, AC-7.1, AC-25.1 |
 | A-25 | decidida | `mcp serve` sin configuración y entrada estándar | `mcp serve` arranca aunque falten `config.toml` o credenciales; cada `tools/call` devuelve el envelope de error correspondiente (`CONFIG_NOT_FOUND`, `AUTH_MISSING`) con `isError: true`. En MCP, el valor `-` (stdin) de `desc`, `text` y similares devuelve `USAGE` («stdin not available in MCP»), porque stdin es el canal del protocolo. | AC-25.2, AC-25.3, AC-1.2, AC-12.4 |
 
-## Notas para versiones futuras
+## Conciliación con el PRD
 
-Observaciones del responsable que no cambian el PRD v1.0.0 y se tendrán en cuenta en la próxima versión:
+La v1.1.0 del PRD (2026-11-09) incorpora al texto las aclaraciones que prevalecían sobre la letra de la v1.0.0 o la ampliaban, y recoge dos decisiones del responsable. No añade ni elimina requisitos: los identificadores de RF, AC y RNF no cambian, y el historial está en la sección 13 del PRD.
 
-- **shortLink.** Candidato a deprecarse como forma de identificar tableros y tarjetas: un harness usa ids y una persona usa nombres. Mientras siga en el PRD, A-14 da prioridad al nombre.
-- **Caché de tableros desaparecidos.** Si un tablero se borra o se pierde el acceso, `BOARD_NOT_FOUND` es correcto, pero sus filas quedan en `cache.db` hasta un `cache clear`: no se sirven nunca y `cache status` las sigue mostrando. El PRD no lo define y el plan lo deja así; decidir en la próxima versión si se purgan al confirmar `BOARD_NOT_FOUND`.
+| Aclaración | Texto del PRD actualizado | Qué quedó conciliado |
+| ---------- | ------------------------- | -------------------- |
+| A-23 | AC-1.3 y §10.5 (archivo de configuración) | `config init` escribe la configuración mínima (solo `[auth]` activo) y el resto de la plantilla comentado con sus valores por defecto |
+| A-14 | AC-1.9, AC-7.3 y §10.6 | Un valor de 8 alfanuméricos se busca primero por nombre y luego por shortLink contra el caché |
+| A-15 | AC-1.8 | Los comandos `card` con una tarjeta dada por id o URL no exigen tablero seleccionado |
+| A-17 | AC-22.14 | Las tarjetas de una lista desaparecida se eliminan del caché y se piden a demanda |
+| A-19 | AC-5.2 | Las comprobaciones de DNS y TLS apuntan al host de `http.base_url` |
+| A-20 | AC-13.3 | La búsqueda local admite clases `[...]`; en comentarios se eliminan con aviso |
+| A-24 | §10.5 (opciones globales), AC-1.9, AC-25.1 | Opción global `--include-archived-boards` y parámetro MCP `include_archived_boards` |
 
-### Conciliación pendiente con el PRD
+Decisiones del responsable recogidas en la v1.1.0 (§12 del PRD, decisiones 15 y 16):
 
-Aclaraciones que prevalecen sobre la letra del PRD v1.0.0 o la amplían. En la próxima versión del PRD hay que incorporarlas al texto indicado para que PRD y plan vuelvan a coincidir.
+- **shortLink.** No se depreca: sigue siendo un identificador válido de tableros y tarjetas; A-14 da prioridad al nombre cuando un valor tiene 8 alfanuméricos. Se reconsiderará en una versión futura.
+- **Caché de tableros desaparecidos.** No se purga: `BOARD_NOT_FOUND` es correcto, las filas no se sirven nunca y se eliminan con `cache clear` (§10.6).
 
-| Aclaración | Texto del PRD afectado | Qué hay que conciliar |
-| ---------- | ---------------------- | --------------------- |
-| A-23 | AC-1.3 y §10.5 («Plantilla completa, la que escribe `config init`») | `config init` escribe la configuración mínima (solo `[auth]` activo) y el resto de la plantilla comentado con sus valores por defecto; §10.5 debe mostrar ese archivo como el que genera `config init` |
-| A-14 | AC-1.9, AC-7.3 (orden id, shortLink, URL, nombre) y §10.6 (`member_boards` solo se consulta con nombres) | Un valor de 8 alfanuméricos se busca primero por nombre y luego por shortLink; posible deprecación del shortLink (nota anterior) |
-| A-15 | AC-1.8 («sin ninguno de los tres, `BOARD_NOT_CONFIGURED`») | Los comandos `card` con una tarjeta dada por id o URL no exigen tablero seleccionado |
-| A-17 | AC-22.14 («se marcan rancias») | Las tarjetas de una lista desaparecida se eliminan del caché y se piden a demanda |
-| A-19 | AC-5.2 («DNS y TLS con `api.trello.com`») | Las comprobaciones apuntan al host de `http.base_url` |
-| A-20 | AC-13.3 (solo `*` y `?` como comodines) | La búsqueda local admite también clases `[...]`; en comentarios se eliminan con aviso |
-| A-24 | §10.5 (opciones globales), AC-1.9, AC-25.1 | Nueva opción global `--include-archived-boards` y parámetro MCP `include_archived_boards`; por defecto, la resolución por nombre excluye los tableros archivados en Trello |
-| — | RF-22 y §10.6 | Purga, o no, del caché de un tablero borrado o inaccesible (ver la nota anterior) |
+Además, RNF-10 y la decisión 13 reflejan que `README.md` está en español, junto con `docs/`.
 
 ## Protocolo de ejecución
 
@@ -281,3 +280,4 @@ El workflow `.github/workflows/ci.yml` corre en cada PR contra `develop` o `main
 | 2026-11-09 | M00 a M13 fusionados en `develop` mediante PR #1 a #15 (el #10 es el refactor `touch_cards` de la caché), cada uno con CI en verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14; F5 y estado pasan a 🟢 `done`. Errores de CI encontrados y corregidos: comprobación de la instalación base (M00), recursión del aviso de rotación de logs (M01) y comparación de saltos de línea en la prueba del skill (M13) |
 | 2026-11-09 | M15 fusionado en `develop` mediante el PR #16, con CI en verde en los tres sistemas y las tres versiones de Python |
 | 2026-11-09 | M14 fusionado en `develop` mediante el PR #17 y M16 mediante el PR #18; los 17 milestones quedan en 🟢. Se añade `docs/plan/99-walkthrough.md`. Pendientes del responsable: TCs manuales de [[tc-manuales-trello]] y fusión de `develop` en `main` |
+| 2026-11-09 | PRD v1.1.0: incorpora las aclaraciones A-14, A-15, A-17, A-19, A-20, A-23 y A-24, decide no deprecar el shortLink ni purgar la caché de tableros desaparecidos y refleja el README en español; los identificadores de requisitos no cambian |
