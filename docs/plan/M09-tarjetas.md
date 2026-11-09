@@ -1,7 +1,7 @@
 ---
 id: M09
 title: Tarjetas — crear, consultar, buscar, mover, copiar y actualizar
-status: pending
+status: in_review
 wave: 5
 depends_on: [M02, M07]
 branch: feature/m09-tarjetas
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M09 — Tarjetas: crear, consultar, buscar, mover, copiar y actualizar
 
-**Estado:** ⚪ Pendiente · **Ola:** 5 · **Depende de:** M02, M07 · **Rama:** `feature/m09-tarjetas`
+**Estado:** 🔵 En revisión · **Ola:** 5 · **Depende de:** M02, M07 · **Rama:** `feature/m09-tarjetas`
 
 ## Objetivo
 
@@ -43,11 +43,13 @@ Subgrupos `card comment|label|member|checklist` (M10) y `card attachments` (M11)
 
 | Fase | Descripción                                                     | Estado |
 | ---- | --------------------------------------------------------------- | ------ |
-| F1   | Implementación                                                  | ⚪      |
-| F2   | Pruebas unitarias                                               | ⚪      |
-| F3   | TCs automatizados                                               | ⚪      |
-| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | ⚪      |
+| F1   | Implementación                                                  | 🟢      |
+| F2   | Pruebas unitarias                                               | 🟢      |
+| F3   | TCs automatizados                                               | 🟢      |
+| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | 🟢      |
 | F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪      |
+
+F5: solo local; PR y CI pendientes de confirmación del usuario (local only: PR and CI pending user confirmation).
 
 ## Casos de prueba automatizados
 
@@ -123,3 +125,8 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 
 | Fecha | Evento |
 | ----- | ------ |
+| 2026-11-09 | F1 y F2: `app/search.py`, `app/commands/card.py`, bloque `card` del registro y pruebas unitarias (búsqueda, argumentos, vistas y flujos de error) |
+| 2026-11-09 | F3: 61 de 61 TCs automatizados (nivel E) con Trello falso ampliado: `cards_write.py`, `comments.py`, `search.py`; verificados uno a uno por su marcador |
+| 2026-11-09 | Desviación: `--left` y `--right` exigen el valor N en la CLI (el registro no admite opciones con valor opcional); TC-M09-039 usa `--left 1` |
+| 2026-11-09 | Desviación: `tests/fakes/trello/core.py` (M00) ahora sustituye una ruta registrada con el mismo método y forma de ruta; sin ello las pruebas de M07 que registran `PUT /cards/{id}` quedaban tapadas por la ruta de `cards_write.py` |
+| 2026-11-09 | F4: ruff check, ruff format --check, mypy, pytest con cobertura y trazabilidad en verde (ver informe final) |
