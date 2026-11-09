@@ -43,7 +43,7 @@ Publicación en PyPI y merge a `main` (decisión del responsable tras este miles
 | ---- | --------------------------------------------------------------- | ------ |
 | F1   | Implementación (README y ajustes de cierre)                     | 🟢      |
 | F2   | Pruebas unitarias                                               | 🟢      |
-| F3   | TCs automatizados                                               | 🟡      |
+| F3   | TCs automatizados                                               | 🟢      |
 | F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad estricta | ⚪ |
 | F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪      |
 
