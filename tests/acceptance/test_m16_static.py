@@ -301,13 +301,23 @@ def test_a_credential_option_is_refused_as_usage(
     flag: str, capsys: pytest.CaptureFixture[str]
 ) -> None:
     import json
+    import os
 
-    for argv in (["board", "show", flag, "secret-value"], [flag, "secret-value", "board", "show"]):
+    argvs = (
+        ["board", "show", flag, "secret-value"],
+        [flag, "secret-value", "board", "show"],
+        ["board", "show", f"{flag}=secret-value"],
+    )
+    for argv in argvs:
         code = cli.main(argv)
-        out = capsys.readouterr().out
+        captured = capsys.readouterr()
         assert code == 2, argv
-        envelope = json.loads(out)
+        envelope = json.loads(captured.out)
         assert envelope["error"]["code"] == "USAGE"
+        assert "secret-value" not in captured.out + captured.err
+    home = Path(os.environ["TRELLOCTL_HOME"])
+    for log in home.rglob("*.log*"):
+        assert "secret-value" not in log.read_text(encoding="utf-8", errors="replace")
 
 
 PRD = ROOT / "docs" / "PRD.md"
