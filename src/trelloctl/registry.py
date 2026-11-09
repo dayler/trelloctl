@@ -307,7 +307,204 @@ def _config() -> list[Operation]:
 
 
 # ==== BEGIN block: board ====
-# M08 adds the `board` operations here.
+@block("board")
+def _board() -> list[Operation]:
+    from trelloctl.app.commands import activity, board, labels, lists
+
+    list_ref = Param("list", "list: id or name", positional=True, required=True)
+    label_ref = Param("label", "label: id, name or name:color", positional=True, required=True)
+    return [
+        Operation(
+            ("board", "show"),
+            "board id, name, url, default flag and counts",
+            "trelloctl board show",
+            board.show,
+            description="Served from the cache: metadata and the open-cards snapshot.",
+            need=Need.BOARD,
+            cached_read=True,
+        ),
+        Operation(
+            ("board", "lists"),
+            "open lists by position with index and card count",
+            "trelloctl board lists --all",
+            board.lists,
+            params=(Param("all", "include archived lists", ParamType.BOOL),),
+            need=Need.BOARD,
+            cached_read=True,
+        ),
+        Operation(
+            ("board", "labels"),
+            "labels of the board",
+            "trelloctl board labels",
+            board.labels,
+            need=Need.BOARD,
+            cached_read=True,
+        ),
+        Operation(
+            ("board", "members"),
+            "members of the board",
+            "trelloctl board members",
+            board.members,
+            need=Need.BOARD,
+            cached_read=True,
+        ),
+        Operation(
+            ("board", "activity"),
+            "actions of the board, newest first (never cached)",
+            "trelloctl board activity --type createCard,commentCard --limit 20",
+            activity.activity,
+            params=(
+                Param("since", "only actions after this ISO-8601 date", metavar="ISO8601"),
+                Param("before", "only actions before this ISO-8601 date", metavar="ISO8601"),
+                Param("type", "comma-separated Trello action types", ParamType.CSV),
+                Param(
+                    "limit",
+                    "maximum number of actions (default 50, 0 for all)",
+                    ParamType.INT,
+                ),
+                Param("fields", "comma-separated fields of each action", ParamType.CSV),
+            ),
+            description=(
+                "Reads GET /boards/{id}/actions, paginating with `before`. At most 50 actions "
+                "by default; meta.truncated tells whether more exist. Fields: id, type, date, "
+                "member, card, list, data."
+            ),
+            need=Need.BOARD,
+        ),
+        Operation(
+            ("board", "list", "create"),
+            "create a list",
+            'trelloctl board list create --name "Review" --pos 2',
+            lists.create,
+            params=(
+                Param("name", "name of the list", required=True),
+                Param(
+                    "pos",
+                    "top, bottom (default) or a 0-based index among the open lists",
+                    metavar="POS",
+                ),
+            ),
+            need=Need.BOARD,
+        ),
+        Operation(
+            ("board", "list", "rename"),
+            "rename a list",
+            'trelloctl board list rename "To Do" --name Backlog',
+            lists.rename,
+            params=(list_ref, Param("name", "new name", required=True)),
+            need=Need.BOARD,
+        ),
+        Operation(
+            ("board", "list", "archive"),
+            "archive a list (its cards are not archived)",
+            'trelloctl board list archive "Done"',
+            lists.archive,
+            params=(list_ref,),
+            need=Need.BOARD,
+        ),
+        Operation(
+            ("board", "list", "unarchive"),
+            "restore an archived list",
+            'trelloctl board list unarchive "Done"',
+            lists.unarchive,
+            params=(list_ref,),
+            need=Need.BOARD,
+        ),
+        Operation(
+            ("board", "list", "move"),
+            "move a list among the open lists",
+            'trelloctl board list move "Doing" --right 1 --dry-run',
+            lists.move,
+            params=(
+                list_ref,
+                Param(
+                    "to_index",
+                    "final 0-based index among the open lists",
+                    ParamType.INT,
+                    required=True,
+                    exclusive="target",
+                    metavar="N",
+                ),
+                Param(
+                    "left",
+                    "move N positions to the left",
+                    ParamType.INT,
+                    exclusive="target",
+                    metavar="N",
+                ),
+                Param(
+                    "right",
+                    "move N positions to the right",
+                    ParamType.INT,
+                    exclusive="target",
+                    metavar="N",
+                ),
+                Param("clamp", "stop at the first or last list instead of failing", ParamType.BOOL),
+                Param("dry_run", "compute the move without writing", ParamType.BOOL),
+            ),
+            description=(
+                "Reads fresh metadata first, then sets the position. Out of range gives "
+                "MOVE_OUT_OF_RANGE unless --clamp is given."
+            ),
+            need=Need.BOARD,
+        ),
+        Operation(
+            ("board", "list", "move-cards"),
+            "move all open cards of a list to another list",
+            'trelloctl board list move-cards "Doing" --to "Done"',
+            lists.move_cards,
+            params=(list_ref, Param("to", "target list: id or name", required=True)),
+            need=Need.BOARD,
+        ),
+        Operation(
+            ("board", "list", "archive-cards"),
+            "archive all open cards of a list",
+            'trelloctl board list archive-cards "Done"',
+            lists.archive_cards,
+            params=(list_ref,),
+            need=Need.BOARD,
+        ),
+        Operation(
+            ("board", "label", "create"),
+            "create a label",
+            "trelloctl board label create --name bug --color red",
+            labels.create,
+            params=(
+                Param("name", "name of the label", required=True),
+                Param(
+                    "color",
+                    "label color (or none)",
+                    required=True,
+                    choices=labels.COLORS,
+                    metavar="COLOR",
+                ),
+            ),
+            need=Need.BOARD,
+        ),
+        Operation(
+            ("board", "label", "update"),
+            "change the name or the color of a label",
+            "trelloctl board label update bug --color orange",
+            labels.update,
+            params=(
+                label_ref,
+                Param("name", "new name"),
+                Param("color", "new color (or none)", choices=labels.COLORS, metavar="COLOR"),
+            ),
+            need=Need.BOARD,
+        ),
+        Operation(
+            ("board", "label", "remove"),
+            "delete a label from the board and from all its cards",
+            "trelloctl board label remove bug --yes",
+            labels.remove,
+            params=(label_ref,),
+            need=Need.BOARD,
+            requires_yes=True,
+        ),
+    ]
+
+
 # ==== END block: board ====
 
 
@@ -539,6 +736,95 @@ def _card() -> list[Operation]:
 
 
 # ==== END block: card ====
+
+
+# ==== BEGIN block: card attachments ====
+_CARD_PARAM = Param(
+    "card",
+    "card: id, URL, shortLink, idShort or name",
+    positional=True,
+    required=True,
+)
+
+
+@block("card attachments")
+def _card_attachments() -> list[Operation]:
+    from trelloctl.app.commands import attachments as cmd
+
+    return [
+        Operation(
+            ("card", "attachments", "list"),
+            "list the attachments of a card, with the local path of downloaded files",
+            "trelloctl card attachments list 6b00000000000000000000c1",
+            cmd.list_attachments,
+            params=(_CARD_PARAM,),
+            description="Served from the local cache; --fresh reads the card from Trello.",
+            need=Need.CREDENTIALS,
+            cached_read=True,
+        ),
+        Operation(
+            ("card", "attachments", "download"),
+            "download the files of a card (--all) or one file (--id)",
+            "trelloctl card attachments download 6b00000000000000000000c1 --all",
+            cmd.download,
+            params=(
+                _CARD_PARAM,
+                Param(
+                    "all",
+                    "download new and changed files, keep equal ones, delete orphans",
+                    ParamType.BOOL,
+                    required=True,
+                    exclusive="target",
+                ),
+                Param("id", "attachment id to download", exclusive="target"),
+            ),
+            description=(
+                "Reads the card from Trello (one call) and downloads each uploaded file, one "
+                "request at a time, to <HOME>/attachments/<board_id>/<card_id>/. Links are "
+                "reported as skipped. On RATE_LIMITED the error carries what was done in "
+                "error.details.partial."
+            ),
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "attachments", "add"),
+            "upload a file or attach a link to a card",
+            "trelloctl card attachments add 6b00000000000000000000c1 --file report.pdf",
+            cmd.add,
+            params=(
+                _CARD_PARAM,
+                Param(
+                    "file",
+                    "path of the file to upload",
+                    metavar="PATH",
+                    required=True,
+                    exclusive="source",
+                ),
+                Param("url", "link to attach", exclusive="source"),
+                Param("name", "attachment name"),
+            ),
+            description=(
+                "Give --file or --url. A file larger than attachments.max_upload_bytes fails "
+                "with ATTACHMENT_TOO_LARGE before any call to Trello."
+            ),
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("card", "attachments", "clear"),
+            "delete the downloaded files of a card (or one attachment)",
+            "trelloctl card attachments clear 6b00000000000000000000c1",
+            cmd.clear,
+            params=(_CARD_PARAM, Param("id", "attachment id; without it, every file of the card")),
+            description=(
+                "Deletes local copies only, never the attachments in Trello. Does not call "
+                "Trello and does not need config.toml."
+            ),
+            mcp=False,
+        ),
+    ]
+
+
+# ==== END block: card attachments ====
 
 
 # ==== BEGIN block: inbox ====

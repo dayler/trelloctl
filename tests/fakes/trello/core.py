@@ -126,12 +126,18 @@ class Router:
 
     def __init__(self) -> None:
         self.routes: list[Route] = []
+        # Once the resource modules are loaded, routes added by a test go first so that a
+        # test can override a route of a module (the first match wins).
+        self.override = False
 
     def route(
         self, method: str, template: str, auth: str = "query"
     ) -> Callable[[Handler], Handler]:
         def decorator(handler: Handler) -> Handler:
             route = Route(method.upper(), template, handler, auth)
+            if self.override:
+                self.routes.insert(0, route)
+                return handler
             shape = _shape(template)
             for index, existing in enumerate(self.routes):
                 if existing.method == route.method and _shape(existing.template) == shape:
@@ -240,6 +246,7 @@ class FakeTrello:
             register = getattr(module, "register", None)
             if register is not None:
                 register(self.router)
+        self.router.override = True
 
     @property
     def routes(self) -> list[tuple[str, str]]:
