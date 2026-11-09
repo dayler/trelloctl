@@ -191,6 +191,52 @@ def create_card(req: Request) -> Response | dict[str, Any]:
     return public(card)
 
 
+def move_to_board(
+    state: State, card: dict[str, Any], board_id: str, list_id: str | None
+) -> Response | None:
+    """Move a card to another board: the list defaults to the first open one.
+
+    Like Trello, the card gets the next ``idShort`` of the new board and keeps only the labels
+    that belong to it.
+    """
+    if board_id not in state.boards:
+        return missing(board_id)
+    if list_id is None:
+        lists = sorted(
+            (x for x in state.lists.values() if x["idBoard"] == board_id and not x.get("closed")),
+            key=lambda x: (x.get("pos", 0), x["id"]),
+        )
+        if not lists:
+            return text_response("invalid value for idList", 400)
+        list_id = lists[0]["id"]
+    list_row = state.lists.get(list_id)
+    if list_row is None:
+        return missing(list_id)
+    if list_row["idBoard"] != board_id:
+        return text_response("invalid value for idList", 400)
+    if card.get("idBoard") != board_id:
+        card["idShort"] = 1 + max(
+            (
+                int(c.get("idShort", 0))
+                for c in state.cards.values()
+                if c.get("idBoard") == board_id
+            ),
+            default=0,
+        )
+        set_labels(
+            state,
+            card,
+            [
+                i
+                for i in card.get("idLabels", [])
+                if state.labels.get(i, {}).get("idBoard") == board_id
+            ],
+        )
+    card["idBoard"] = board_id
+    card["idList"] = list_id
+    return None
+
+
 def update_card(req: Request) -> Response | dict[str, Any]:
     state = req.state
     ident = req.params["card_id"]
@@ -205,8 +251,13 @@ def update_card(req: Request) -> Response | dict[str, Any]:
     for key in ("dueComplete", "closed"):
         if req.param(key) is not None:
             card[key] = req.param(key) == "true"
+    new_board = req.param("idBoard")
     new_list = req.param("idList")
-    if new_list is not None:
+    if new_board is not None:
+        moved = move_to_board(state, card, new_board, new_list)
+        if moved is not None:
+            return moved
+    elif new_list is not None:
         list_row = state.lists.get(new_list)
         if list_row is None:
             return missing(new_list)

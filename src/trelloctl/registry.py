@@ -828,7 +828,76 @@ def _card_attachments() -> list[Operation]:
 
 
 # ==== BEGIN block: inbox ====
-# M12 adds the `inbox` operations here.
+@block("inbox")
+def _inbox() -> list[Operation]:
+    from trelloctl.app.commands import inbox as cmd
+
+    return [
+        Operation(
+            ("inbox", "list"),
+            "list the cards of the personal Inbox",
+            "trelloctl inbox list --limit 20",
+            cmd.list_cards,
+            params=(
+                Param("limit", "maximum cards (default 50; 0 = no limit)", ParamType.INT),
+                Param("fields", "comma-separated fields to keep in each card", ParamType.CSV),
+            ),
+            description=(
+                "Served from the local cache; needs no selected board. INBOX_UNAVAILABLE when "
+                "Trello does not return an Inbox for the account."
+            ),
+            need=Need.CREDENTIALS,
+            cached_read=True,
+        ),
+        Operation(
+            ("inbox", "add"),
+            "add a card to the personal Inbox",
+            'trelloctl inbox add --name "Review November invoice" --due 2026-11-15',
+            cmd.add,
+            params=(
+                Param("name", "card name", required=True),
+                Param("desc", "description; - reads standard input (UTF-8)", exclusive="desc"),
+                Param(
+                    "desc_file",
+                    "read the description from a UTF-8 file",
+                    metavar="PATH",
+                    exclusive="desc",
+                ),
+                Param("due", "due date, ISO-8601 (date alone: 12:00 UTC)", metavar="DATE"),
+            ),
+            description=(
+                "Create the card in the single list of the Inbox and print it. The description "
+                "is sent as is (Markdown). Needs no selected board; takes no list, labels or "
+                "members."
+            ),
+            need=Need.CREDENTIALS,
+        ),
+        Operation(
+            ("inbox", "move"),
+            "move a card of the Inbox to a list of the selected board",
+            'trelloctl inbox move "Review November invoice" --to "To Do" --pos 0',
+            cmd.move,
+            params=(
+                Param(
+                    "card",
+                    "card of the Inbox: id, URL, shortLink, number or name",
+                    positional=True,
+                    required=True,
+                    metavar="CARD",
+                ),
+                Param("to", "target list id or name, on the selected board", required=True),
+                Param("pos", "top, bottom or final index (0-based)", metavar="POS"),
+            ),
+            description=(
+                "The only operation that crosses boards: the card is resolved against the Inbox "
+                "and moved to a list of the board selected by --board, TRELLO_BOARD or the "
+                "default one."
+            ),
+            need=Need.BOARD,
+        ),
+    ]
+
+
 # ==== END block: inbox ====
 
 
