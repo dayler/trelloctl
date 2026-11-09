@@ -20,10 +20,16 @@ def _select(member: dict[str, Any], fields: str | None) -> dict[str, Any]:
     return {k: v for k, v in member.items() if k in wanted or k == "id"}
 
 
+def _with_inbox(req: Request, member: dict[str, Any]) -> dict[str, Any]:
+    """The ``inbox`` field of ``/members/me`` (``{"idBoard", "idList"}``), when one is seeded."""
+    inbox = req.state.extra.get("inbox")
+    return {**member, "inbox": dict(inbox)} if inbox else member
+
+
 def register(router: Router) -> None:
     @router.route("GET", "/members/me")
     def get_me(req: Request) -> dict[str, Any]:
-        member = req.state.members.get("me", DEFAULT_ME)
+        member = _with_inbox(req, req.state.members.get("me", DEFAULT_ME))
         return _select(member, req.param("fields"))
 
     @router.route("GET", "/members/{ident}")
