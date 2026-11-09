@@ -120,7 +120,7 @@ jobs:
 
       - name: Only trelloctl is installed (RNF-1)
         run: |
-          extra="$(uv pip freeze --python "$RUNNER_TEMP/base" | grep -v '^trelloctl==' || true)"
+          extra="$(uv pip freeze --python "$RUNNER_TEMP/base" | grep -Ev '^trelloctl( @ |==)' || true)"
           if [ -n "$extra" ]; then
             echo "Unexpected runtime dependencies:"
             echo "$extra"
