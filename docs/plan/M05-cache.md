@@ -1,7 +1,7 @@
 ---
 id: M05
 title: Caché SQLite — almacén, TTL y modo sin caché
-status: pending
+status: in_review
 wave: 3
 depends_on: [M01, M02]
 branch: feature/m05-cache
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M05 — Caché SQLite: almacén, TTL y modo sin caché
 
-**Estado:** ⚪ Pendiente · **Ola:** 3 · **Depende de:** M01, M02 · **Rama:** `feature/m05-cache`
+**Estado:** 🔵 En revisión · **Ola:** 3 · **Depende de:** M01, M02 · **Rama:** `feature/m05-cache`
 
 ## Objetivo
 
@@ -42,11 +42,11 @@ Recargas desde Trello, resolución de nombres y comandos `cache *` (M07).
 
 | Fase | Descripción                                                     | Estado |
 | ---- | --------------------------------------------------------------- | ------ |
-| F1   | Implementación                                                  | ⚪      |
-| F2   | Pruebas unitarias                                               | ⚪      |
-| F3   | TCs automatizados                                               | ⚪      |
-| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | ⚪      |
-| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪      |
+| F1   | Implementación                                                  | 🟢      |
+| F2   | Pruebas unitarias                                               | 🟢      |
+| F3   | TCs automatizados                                               | 🟢      |
+| F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | 🟢      |
+| F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪ (solo local: PR y CI pendientes de confirmación del usuario) |
 
 ## Casos de prueba automatizados
 
@@ -78,3 +78,5 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 
 | Fecha | Evento |
 | ----- | ------ |
+| 2026-11-09 | Implementado `infra/cache.py` (esquema §10.6, WAL, TTL con frontera A-8, reemplazo transaccional, A-17, backend en memoria, estadísticas, vaciado, comprobación de integridad). 17/17 TCs automatizados y verificados uno a uno, 11 pruebas unitarias. |
+| 2026-11-09 | F4 local: uv sync, ruff check, ruff format --check, mypy, pytest (217 passed, cobertura 98,76 %) y check_traceability.py, todos OK. F5 pendiente: solo local, PR y CI pendientes de confirmación del usuario. |
