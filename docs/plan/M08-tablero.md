@@ -1,7 +1,7 @@
 ---
 id: M08
 title: Tablero — lecturas, listas, etiquetas y actividad
-status: pending
+status: in_progress
 wave: 5
 depends_on: [M02, M07]
 branch: feature/m08-tablero
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M08 — Tablero: lecturas, listas, etiquetas y actividad
 
-**Estado:** ⚪ Pendiente · **Ola:** 5 · **Depende de:** M02, M07 · **Rama:** `feature/m08-tablero`
+**Estado:** 🟡 En curso · **Ola:** 5 · **Depende de:** M02, M07 · **Rama:** `feature/m08-tablero`
 
 ## Objetivo
 
@@ -42,7 +42,7 @@ Comandos `card` (M09).
 
 | Fase | Descripción                                                     | Estado |
 | ---- | --------------------------------------------------------------- | ------ |
-| F1   | Implementación                                                  | ⚪      |
+| F1   | Implementación                                                  | 🟡      |
 | F2   | Pruebas unitarias                                               | ⚪      |
 | F3   | TCs automatizados                                               | ⚪      |
 | F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | ⚪      |
