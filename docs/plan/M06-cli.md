@@ -1,7 +1,7 @@
 ---
 id: M06
 title: Registro, CLI, ayuda, versión y comandos config
-status: pending
+status: in_progress
 wave: 3
 depends_on: [M01, M03, M04]
 branch: feature/m06-cli
@@ -10,7 +10,7 @@ tags: [plan, milestone, trelloctl]
 
 # M06 — Registro, CLI, ayuda, versión y comandos `config`
 
-**Estado:** ⚪ Pendiente · **Ola:** 3 · **Depende de:** M01, M03, M04 · **Rama:** `feature/m06-cli`
+**Estado:** 🟡 En curso · **Ola:** 3 · **Depende de:** M01, M03, M04 · **Rama:** `feature/m06-cli`
 
 ## Objetivo
 
@@ -42,9 +42,9 @@ Resolución de tableros por nombre (M07), comandos de los demás grupos.
 
 | Fase | Descripción                                                     | Estado |
 | ---- | --------------------------------------------------------------- | ------ |
-| F1   | Implementación                                                  | ⚪      |
-| F2   | Pruebas unitarias                                               | ⚪      |
-| F3   | TCs automatizados                                               | ⚪      |
+| F1   | Implementación                                                  | 🟢      |
+| F2   | Pruebas unitarias                                               | 🟢      |
+| F3   | TCs automatizados                                               | 🟡      |
 | F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | ⚪      |
 | F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | ⚪      |
 
