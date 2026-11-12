@@ -74,6 +74,6 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 
 | Fecha | Evento |
 | ----- | ------ |
-| 2026-11-09 | F1-F4 completadas: SKILL.md, `skills list|install|export`, 15 TCs automatizados, seis puertas locales en verde. F5 pendiente: local only, PR and CI pending user confirmation |
+| 2026-11-09 | F1-F4 completadas: SKILL.md, `skills list|install|export`, 15 TCs automatizados, seis puertas locales en verde. |
 | 2026-11-09 | F4: `uv sync --all-extras`, `ruff check`, `ruff format --check`, `mypy`, `pytest` (309 passed, 1 skipped, cobertura 98.85 %), `check_traceability.py` en verde |
 | 2026-11-09 | F5: PR #9 fusionado en `develop` con merge commit, CI en verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14. Estado: `done`. |

@@ -83,5 +83,5 @@ La común del [[00-plan-maestro#Definición de terminado común]], más: CI en v
 | Fecha | Evento |
 | ----- | ------ |
 | 2026-11-09 | F1-F4 completadas en local: empaquetado, esqueleto, Trello falso (núcleo), guardia de red, aislamiento, reloj, comprobador de trazabilidad; 13/13 TCs automatizados y verificados uno a uno; cobertura 100 % sobre `trelloctl` |
-| 2026-11-09 | Las seis comprobaciones locales en verde (sync, ruff check, ruff format, mypy, pytest con cobertura, trazabilidad). F5 pendiente: solo local, PR y CI a la espera de confirmación del usuario |
+| 2026-11-09 | Las seis comprobaciones locales en verde (sync, ruff check, ruff format, mypy, pytest con cobertura, trazabilidad). |
 | 2026-11-09 | F5: PR #1 fusionado en `develop` con merge commit, CI en verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14. Estado: `done`. |

@@ -79,5 +79,5 @@ La común del [[00-plan-maestro#Definición de terminado común]].
 | Fecha | Evento |
 | ----- | ------ |
 | 2026-11-09 | Implementado `infra/cache.py` (esquema §10.6, WAL, TTL con frontera A-8, reemplazo transaccional, A-17, backend en memoria, estadísticas, vaciado, comprobación de integridad). 17/17 TCs automatizados y verificados uno a uno, 11 pruebas unitarias. |
-| 2026-11-09 | F4 local: uv sync, ruff check, ruff format --check, mypy, pytest (217 passed, cobertura 98,76 %) y check_traceability.py, todos OK. F5 pendiente: solo local, PR y CI pendientes de confirmación del usuario. |
+| 2026-11-09 | F4 local: uv sync, ruff check, ruff format --check, mypy, pytest (217 passed, cobertura 98,76 %) y check_traceability.py, todos OK. |
 | 2026-11-09 | F5: PR #6 fusionado en `develop` con merge commit, CI en verde en Windows, Linux y macOS con Python 3.12, 3.13 y 3.14. Estado: `done`. |

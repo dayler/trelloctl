@@ -48,8 +48,6 @@ Comandos `card` (M09).
 | F4   | Verificación local: lint, tipos, cobertura ≥ 90 %, trazabilidad | 🟢      |
 | F5   | PR a `develop`, CI verde en los 3 SO, merge `--no-ff`           | 🟢 |
 
-F5: solo local, PR y CI pendientes de confirmación del usuario.
-
 ## Casos de prueba automatizados
 
 | TC         | AC                 | Tipo | Nivel | Escenario                                                                           | Resultado esperado                                                                             |
