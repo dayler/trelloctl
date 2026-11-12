@@ -4,7 +4,7 @@ Python CLI that lets agent harnesses operate Trello boards with structured JSON 
 
 ## Sources of truth
 
-- `docs/PRD.md` — product requirements and architecture (Spanish). **Closed (v1.0.0): never modify it.** If something in it looks wrong or missing, stop and ask.
+- `docs/PRD.md` — product requirements and architecture (Spanish). **Closed (v1.1.0): never modify it.** If something in it looks wrong or missing, stop and ask.
 - `docs/plan/00-plan-maestro.md` — master plan: milestones, dependencies, waves, traffic-light status, execution protocol and the binding behaviour clarifications A-1 to A-25.
 - `docs/plan/Mxx-*.md` — one plan per milestone: scope, files it owns, files it must not touch, phases and its automated test cases (TCs).
 - `docs/plan/01-estrategia-de-pruebas.md` — test strategy: levels, fake Trello, isolation, traceability, coverage, CI.

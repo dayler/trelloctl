@@ -9,7 +9,7 @@ tags: [plan, trelloctl, walkthrough]
 
 # trelloctl — Walkthrough de la implementación
 
-Resumen de cómo se implementó el [[00-plan-maestro|plan maestro]] sobre el [[PRD]] v1.0.0: qué se construyó, cómo se verificó, qué se desvió del plan y qué queda pendiente. Es la salida del plan maestro. No sustituye a las bitácoras de cada milestone, que guardan el detalle fase por fase.
+Resumen de cómo se implementó el [[00-plan-maestro|plan maestro]] sobre el [[PRD]] (v1.0.0, conciliado después en la v1.1.0): qué se construyó, cómo se verificó, qué se desvió del plan y qué queda pendiente. Es la salida del plan maestro. No sustituye a las bitácoras de cada milestone, que guardan el detalle fase por fase.
 
 ## 1. Resumen ejecutivo
 
@@ -248,7 +248,7 @@ Las aclaraciones A-1 a A-25 del plan maestro fijaron los comportamientos que el 
 | A-24 | M06: 033; M07: 045, 046, 047, 048; M15: 017 |
 | A-25 | M15: 018, 019 |
 
-Siguen pendientes de incorporar al texto del PRD en su próxima versión (sección «Conciliación pendiente con el PRD» del plan maestro): A-23 (`config init` escribe la configuración mínima), A-14 (un valor de 8 alfanuméricos se busca primero por nombre), A-15 (tarjetas por id o URL sin tablero seleccionado), A-17 (tarjetas de una lista desaparecida), A-19 (comprobaciones de red de `doctor` contra `http.base_url`), A-20 (clases `[...]` en la búsqueda local), A-24 (`--include-archived-boards`) y la purga de la caché de un tablero desaparecido. El PRD no se modificó.
+El PRD v1.1.0 incorpora al texto A-23 (`config init` escribe la configuración mínima), A-14 (un valor de 8 alfanuméricos se busca primero por nombre), A-15 (tarjetas por id o URL sin tablero seleccionado), A-17 (tarjetas de una lista desaparecida), A-19 (comprobaciones de red de `doctor` contra `http.base_url`), A-20 (clases `[...]` en la búsqueda local) y A-24 (`--include-archived-boards`); sección «Conciliación con el PRD» del plan maestro. Además decide no deprecar el shortLink y no purgar la caché de un tablero desaparecido (decisiones 15 y 16, §12 del PRD). Los identificadores de requisitos no cambian.
 
 ## 5. Desviaciones respecto del plan
 
@@ -307,6 +307,6 @@ Para la versión mínima de Python: `uv run --python 3.12 pytest -q`. Para la in
 
 - **TCs manuales contra Trello real** (TC-MAN-01 a TC-MAN-11 de [[tc-manuales-trello]]): los ejecuta el responsable, y son condición para fusionar `develop` en `main`. Cuando uno discrepe del Trello falso, se corrige primero el falso y luego el código.
 - **Fusión de `develop` en `main` y publicación** (por ejemplo en PyPI): decisión del responsable, fuera del alcance del plan.
-- **PRD v1.1:** incorporar las aclaraciones de la sección 4 y decidir si el shortLink se depreca y si se purga la caché de tableros desaparecidos.
+- **PRD:** la v1.1.0 ya incorpora las aclaraciones de la sección 4. Queda pendiente, para una versión futura, reconsiderar la deprecación del shortLink y la purga de la caché de tableros desaparecidos.
 - **Riesgo principal:** el Trello falso se basa en la documentación pública del API; los TCs manuales son la comprobación contra el comportamiento real. Los más sensibles son la recarga incremental, los adjuntos con OAuth, el Inbox personal y el servidor MCP con un cliente real.
 - **Higiene del repositorio:** si existe un `develop` local con merges propios de la fase de integración, no debe publicarse: sus merge commits son distintos de los de `origin/develop`.
